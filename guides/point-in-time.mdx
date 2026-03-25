@@ -1,0 +1,123 @@
+---
+title: "Point-in-Time Queries"
+description: "Query what economic data was known at any historical date with the as_of parameter."
+sidebarTitle: "Point-in-Time (as_of)"
+icon: "clock-rotate-left"
+keywords: ["point in time", "vintage data", "as_of", "historical economic data", "FRED alternative"]
+---
+
+Add `?as_of=DATE` to any macro series query. The API returns observations using only data published on or before that date.
+
+## Why this exists
+
+Economic data gets revised. The BEA published Q3 2023 GDP on October 26, 2023 as **\$22,491.567B**. Over the next two years, that same quarter was revised four more times, landing at **\$22,840.989B**.
+
+If you run a backtest using today's values, your model had access to information that didn't exist at the time. The `as_of` parameter prevents that.
+
+## FRED's approach vs. ours
+
+FRED's vintage API (ALFRED) exposes the same data, but requires you to think in terms of `realtime_start`, `realtime_end`, and `output_type`:
+
+```bash
+# ALFRED — 8 parameters, 3 date concepts
+curl "https://api.stlouisfed.org/fred/series/observations\
+?series_id=GDPC1\
+&api_key=YOUR_KEY\
+&file_type=json\
+&realtime_start=2023-10-26\
+&realtime_end=2023-10-26\
+&observation_start=2020-01-01\
+&observation_end=2023-12-31\
+&output_type=2"
+```
+
+MacroData wraps the same concept into one parameter:
+
+<CodeGroup>
+```bash cURL
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/series/GDPC1/observations?as_of=2023-10-26"
+```
+
+```python Python
+import os, requests
+
+resp = requests.get(
+    "https://api.macrodata.dev/v1/series/GDPC1/observations",
+    headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+    params={"as_of": "2023-10-26"}
+)
+data = resp.json()
+
+for obs in data["results"]:
+    print(f"{obs['date']}: {obs['value']} (published {obs['as_of_date']})")
+```
+
+```typescript TypeScript
+const resp = await fetch(
+  "https://api.macrodata.dev/v1/series/GDPC1/observations?as_of=2023-10-26",
+  { headers: { "X-API-Key": process.env.MACRODATA_API_KEY! } }
+);
+const data = await resp.json();
+
+for (const obs of data.results) {
+  console.log(`${obs.date}: ${obs.value} (published ${obs.as_of_date})`);
+}
+```
+</CodeGroup>
+
+```json Response
+{
+  "object": "observation_series",
+  "request_id": "req_...",
+  "status": "ok",
+  "series": { "id": "GDPC1", "title": "Real Gross Domestic Product", "frequency": "Q" },
+  "as_of": "2023-10-26",
+  "results": [
+    { "date": "2023-07-01T00:00:00Z", "value": "22491.567", "as_of_date": "2023-10-26T00:00:00Z" },
+    { "date": "2023-04-01T00:00:00Z", "value": "22225.35", "as_of_date": "2023-09-28T00:00:00Z" },
+    { "date": "2023-01-01T00:00:00Z", "value": "22112.329", "as_of_date": "2023-09-28T00:00:00Z" }
+  ],
+  "results_count": 3,
+  "has_more": true
+}
+```
+
+The value `"22491.567"` is the advance estimate — the number BEA published on October 26, 2023.
+
+## How `as_of` resolves
+
+When you pass `?as_of=2023-10-26`, the API finds the most recent vintage of each observation published **on or before** that date.
+
+For Q3 2023 GDP (`date: 2023-07-01`): the advance estimate was published on 2023-10-26, so you get `"22491.567"`. For Q2 2023 GDP (`date: 2023-04-01`): the latest revision before October 26 was published on 2023-09-28, so you get `"22225.35"`.
+
+Without `as_of`, the API returns the latest revised value for each observation.
+
+## Viewing the full revision trail
+
+Use the revisions endpoint to see how a specific data point changed over time:
+
+```bash
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/series/GDPC1/revisions?date=2023-07-01"
+```
+
+| Published | Value | What changed |
+|---|---|---|
+| 2023-10-26 | 22,491.567 | Advance estimate |
+| 2023-11-29 | 22,506.365 | Second estimate (+\$14.8B) |
+| 2023-12-21 | 22,490.692 | Third estimate (-\$15.7B) |
+| 2024-09-26 | 22,780.933 | Annual revision (+\$290.2B) |
+| 2025-09-25 | 22,840.989 | Annual revision (+\$60.1B) |
+
+See [Understanding data revisions](/guides/revisions) for more on why these happen and which series are affected.
+
+## Common use cases
+
+**Backtesting** — Run your strategy against data-as-known. Query each decision date with `?as_of=` set to that date. Your PnL reflects decisions you could actually have made.
+
+**Regulatory models** — Basel and Solvency II models require data-as-known, not data-as-revised. The `as_of` parameter gives you an auditable trail of what inputs the model used.
+
+**Research replication** — Academic papers reference data available at publication time. Point-in-time queries let you reconstruct the exact dataset the authors worked with.
+
+**Agent grounding** — When an LLM reasons about "what was the economy doing in October 2023?", it needs October 2023's data, not today's revision. Feed `as_of` responses as [function calling output](/guides/ai-agents).

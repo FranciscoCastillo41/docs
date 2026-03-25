@@ -1,0 +1,88 @@
+---
+title: "Pagination"
+description: "MacroData API uses cursor-based pagination with has_more and next_cursor fields."
+icon: "arrow-right-arrow-left"
+---
+
+All list endpoints return paginated results. The default page size is 100, max is 1,000.
+
+## Response fields
+
+```json
+{
+  "object": "yield_series",
+  "results": [...],
+  "results_count": 100,
+  "has_more": true,
+  "next_cursor": "2025-01-15"
+}
+```
+
+| Field | Description |
+|---|---|
+| `results` | Items for this page |
+| `results_count` | Count of items returned |
+| `has_more` | `true` if there are more pages |
+| `next_cursor` | Pass as `?cursor=` to get the next page |
+
+## Paging through results
+
+<CodeGroup>
+```bash cURL
+# First page
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/treasury/yields?limit=100"
+
+# Next page — use next_cursor from previous response
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/treasury/yields?limit=100&cursor=2025-01-15"
+```
+
+```python Python
+import os, requests
+
+headers = {"X-API-Key": os.environ["MACRODATA_API_KEY"]}
+params = {"limit": 100}
+all_results = []
+
+while True:
+    resp = requests.get(
+        "https://api.macrodata.dev/v1/treasury/yields",
+        headers=headers, params=params
+    )
+    data = resp.json()
+    all_results.extend(data["results"])
+
+    if not data["has_more"]:
+        break
+    params["cursor"] = data["next_cursor"]
+```
+
+```typescript TypeScript
+const headers = { "X-API-Key": process.env.MACRODATA_API_KEY! };
+const base = "https://api.macrodata.dev/v1/treasury/yields";
+const allResults: any[] = [];
+let cursor: string | undefined;
+
+do {
+  const params = new URLSearchParams({ limit: "100" });
+  if (cursor) params.set("cursor", cursor);
+
+  const resp = await fetch(`${base}?${params}`, { headers });
+  const data = await resp.json();
+  allResults.push(...data.results);
+  cursor = data.has_more ? data.next_cursor : undefined;
+} while (cursor);
+```
+</CodeGroup>
+
+## Parameters
+
+| Parameter | Type | Default | Max |
+|---|---|---|---|
+| `limit` | integer | 100 | 1000 |
+| `cursor` | string | — | — |
+
+<Warning>
+Cursors are opaque. Don't parse, modify, or construct them — the format may change without notice.
+</Warning>

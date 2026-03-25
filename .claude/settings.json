@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx mintlify dev)",
+      "Bash(npx mintlify build)",
+      "Bash(npx mintlify broken-links)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(git switch*)",
+      "Bash(git push*)",
+      "Bash(git merge*)",
+      "Bash(gh pr *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(ls *)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}

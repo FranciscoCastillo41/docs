@@ -1,0 +1,101 @@
+---
+title: "AI Agents and Function Calling"
+description: "Use the MacroData API as a tool for LLM agents, MCP servers, and function calling."
+icon: "microchip-ai"
+keywords: ["MCP economic data", "LLM function calling", "AI macro data tool"]
+---
+
+MacroData responses are designed to work as function calling output. String-typed values avoid floating-point ambiguity in LLM reasoning, and the consistent envelope fits in context windows without preprocessing.
+
+## Tool definition
+
+Here's a tool definition that works with OpenAI, Anthropic, or any framework that supports JSON Schema:
+
+```python tool_definition.py
+tool = {
+    "type": "function",
+    "function": {
+        "name": "query_economic_data",
+        "description": "Get macro-economic data (GDP, CPI, unemployment, etc). "
+                       "Use as_of to get data as it was known on a specific date.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "series_id": {
+                    "type": "string",
+                    "description": "GDPC1=GDP, CPIAUCSL=CPI, UNRATE=unemployment, "
+                                   "PAYEMS=payrolls, FEDFUNDS=fed funds rate"
+                },
+                "as_of": {
+                    "type": "string",
+                    "description": "Date (YYYY-MM-DD). Returns data as known on this date. "
+                                   "Omit for latest values."
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Number of observations (default 5, max 1000)"
+                }
+            },
+            "required": ["series_id"]
+        }
+    }
+}
+```
+
+## Implementation
+
+```python tools.py
+import os
+import requests
+
+def query_economic_data(series_id: str, as_of: str = None, limit: int = 5) -> dict:
+    params = {"limit": limit}
+    if as_of:
+        params["as_of"] = as_of
+
+    resp = requests.get(
+        f"https://api.macrodata.dev/v1/series/{series_id}/observations",
+        headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+        params=params
+    )
+    return resp.json()
+```
+
+When the model calls `query_economic_data(series_id="GDPC1", as_of="2023-10-26")`, it gets back exactly what GDP was when the advance estimate was published — not today's revised number. This matters for any agent reasoning about historical economic conditions.
+
+## Treasury yields tool
+
+```python tools.py
+def query_yield_curve(date: str = None) -> dict:
+    params = {}
+    if date:
+        params["date"] = date
+
+    resp = requests.get(
+        "https://api.macrodata.dev/v1/treasury/yields/curve",
+        headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+        params=params
+    )
+    return resp.json()
+```
+
+## Why `as_of` matters for agents
+
+Without `as_of`, an agent answering "what did the economy look like in October 2023?" gets today's revised data. The GDP number it sees (\$22,841B) is \$349B higher than what anyone actually knew in October 2023 (\$22,492B).
+
+For agents making decisions, generating analysis, or answering historical questions, `as_of` prevents hallucinating knowledge that didn't exist yet.
+
+## Available series
+
+| Series ID | Description | Frequency |
+|---|---|---|
+| GDPC1 | Real GDP | Quarterly |
+| CPIAUCSL | Consumer Price Index | Monthly |
+| UNRATE | Unemployment Rate | Monthly |
+| PAYEMS | Nonfarm Payrolls | Monthly |
+| FEDFUNDS | Federal Funds Rate | Monthly |
+| INDPRO | Industrial Production | Monthly |
+| HOUST | Housing Starts | Monthly |
+| PCEPI | PCE Price Index | Monthly |
+
+Use `GET /v1/series?q=inflation` to discover more. See the [API Reference](/api-reference) for the full endpoint documentation.

@@ -1,122 +1,120 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
-  "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+  "name": "MacroData API",
+  "description": "Point-in-time macro-economic and treasury data API.",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg",
+    "href": "/"
   },
   "favicon": "/favicon.svg",
+  "theme": "linden",
+  "appearance": {
+    "default": "dark"
+  },
+  "colors": {
+    "primary": "#F59E0B",
+    "light": "#FBBF24",
+    "dark": "#D97706"
+  },
+  "background": {
+    "decoration": "windows"
+  },
+  "fonts": {
+    "heading": {
+      "family": "Inter",
+      "weight": 700
+    },
+    "body": {
+      "family": "Inter",
+      "weight": 400
+    }
+  },
+  "styling": {
+    "codeblocks": "dark"
+  },
+  "search": {
+    "prompt": "Search docs..."
+  },
+  "thumbnails": {
+    "appearance": "dark",
+    "fonts": {
+      "family": "Inter"
+    }
+  },
+  "seo": {
+    "indexing": "navigable",
+    "metatags": {
+      "og:site_name": "MacroData API Docs",
+      "twitter:card": "summary_large_image"
+    }
+  },
+  "metadata": {
+    "timestamp": true
+  },
+  "topbar": {
+    "links": [
+      { "name": "Dashboard", "url": "https://app.macrodata.dev" },
+      { "name": "Status", "url": "https://status.macrodata.dev" }
+    ],
+    "cta": {
+      "name": "Get API Key",
+      "url": "https://app.macrodata.dev/signup"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
+        "icon": "book-open",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
+            "icon": "play",
+            "pages": ["index", "quickstart", "essentials/authentication"]
+          },
+          {
+            "group": "Core Concepts",
+            "icon": "puzzle-piece",
+            "pages": ["essentials/rate-limits", "essentials/errors", "essentials/pagination"]
+          },
+          {
+            "group": "Guides",
+            "icon": "map",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "guides/point-in-time",
+              "guides/yield-curve",
+              "guides/revisions",
+              "guides/python-quickstart",
+              "guides/ai-agents"
             ]
           },
           {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
+            "group": "Changelog",
+            "icon": "clock",
+            "pages": ["changelog"]
           }
         ]
       },
       {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
+        "tab": "API Reference",
+        "icon": "square-terminal",
+        "openapi": "openapi/v1.yaml"
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
+    ]
+  },
+  "api": {
+    "baseUrl": "https://api.macrodata.dev",
+    "auth": {
+      "method": "key",
+      "name": "X-API-Key"
+    },
+    "playground": {
+      "mode": "simple"
     }
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+  "footerSocials": {
+    "github": "https://github.com/FranciscoCastillo41",
+    "twitter": "https://x.com/macrodata"
   }
 }

@@ -1,0 +1,418 @@
+openapi: 3.1.0
+info:
+  title: MacroData API
+  version: 1.0.0
+  description: |
+    Point-in-time macro-economic and treasury data API.
+    The killer feature: `?as_of=DATE` returns what economic data was known at any historical date.
+  contact:
+    name: MacroData Support
+    url: https://macrodata.dev
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.macrodata.dev
+    description: Production
+  - url: http://localhost:8080
+    description: Local development
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key prefixed with `mda_live_`
+
+  schemas:
+    YieldRate:
+      type: object
+      properties:
+        trade_date:
+          type: string
+          format: date-time
+          example: "2026-03-24T00:00:00Z"
+        maturity:
+          type: string
+          enum: ["1M", "2M", "3M", "4M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "20Y", "30Y"]
+          example: "10Y"
+        rate:
+          type: string
+          description: Decimal rate as string (never float)
+          example: "4.39"
+        curve_type:
+          type: string
+          enum: ["PAR", "TIPS"]
+          example: "PAR"
+
+    SpreadPoint:
+      type: object
+      properties:
+        trade_date:
+          type: string
+          format: date-time
+        long_rate:
+          type: string
+          example: "4.39"
+        short_rate:
+          type: string
+          example: "3.90"
+        spread_bps:
+          type: string
+          description: Spread in basis points
+          example: "49.00"
+        long_maturity:
+          type: string
+          example: "10Y"
+        short_maturity:
+          type: string
+          example: "2Y"
+
+    Observation:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          example: "2023-07-01T00:00:00Z"
+        value:
+          type: string
+          description: Decimal value as string (never float)
+          example: "22491.567"
+        as_of_date:
+          type: string
+          format: date-time
+          description: The vintage date — when this value was published
+          example: "2023-10-26T00:00:00Z"
+        series_id:
+          type: string
+          example: "GDPC1"
+        unit:
+          type: string
+          example: "lin"
+        frequency:
+          type: string
+          example: "Q"
+
+    Series:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "GDPC1"
+        title:
+          type: string
+          example: "Real Gross Domestic Product"
+        frequency:
+          type: string
+          enum: ["D", "W", "M", "Q", "A"]
+        units:
+          type: string
+        observation_count:
+          type: integer
+        last_updated:
+          type: string
+          format: date-time
+
+    Problem:
+      type: object
+      description: RFC 9457 Problem Details
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "https://macrodata.dev/errors/not-found"
+        title:
+          type: string
+          example: "Not Found"
+        status:
+          type: integer
+          example: 404
+        detail:
+          type: string
+          example: "series 'INVALID' not found"
+        instance:
+          type: string
+        request_id:
+          type: string
+
+  parameters:
+    limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+        default: 100
+    cursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+      description: Opaque pagination cursor from previous response
+    from:
+      name: from
+      in: query
+      schema:
+        type: string
+        format: date
+      description: Start date (YYYY-MM-DD)
+    to:
+      name: to
+      in: query
+      schema:
+        type: string
+        format: date
+      description: End date (YYYY-MM-DD)
+
+paths:
+  /healthz:
+    get:
+      summary: Liveness probe
+      security: []
+      responses:
+        "200":
+          description: Server is alive
+
+  /readyz:
+    get:
+      summary: Readiness probe
+      security: []
+      responses:
+        "200":
+          description: All dependencies healthy
+        "503":
+          description: One or more dependencies unhealthy
+
+  /v1/ping:
+    get:
+      summary: Auth test
+      description: Validates API key and returns plan info
+      tags: [Auth]
+      responses:
+        "200":
+          description: API key is valid
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+  /v1/treasury/yields:
+    get:
+      summary: List treasury yield rates
+      tags: [Treasury]
+      parameters:
+        - name: maturity
+          in: query
+          schema:
+            type: string
+            enum: ["1M", "2M", "3M", "4M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "20Y", "30Y"]
+        - name: curve_type
+          in: query
+          schema:
+            type: string
+            enum: ["PAR", "TIPS"]
+            default: "PAR"
+        - $ref: "#/components/parameters/from"
+        - $ref: "#/components/parameters/to"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/cursor"
+      responses:
+        "200":
+          description: Paginated yield rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "yield_series"
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/YieldRate"
+                  results_count:
+                    type: integer
+                  has_more:
+                    type: boolean
+                  next_cursor:
+                    type: string
+
+  /v1/treasury/yields/curve:
+    get:
+      summary: Full yield curve for a date
+      tags: [Treasury]
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Date for the curve snapshot (defaults to today)
+        - name: curve_type
+          in: query
+          schema:
+            type: string
+            enum: ["PAR", "TIPS"]
+            default: "PAR"
+      responses:
+        "200":
+          description: All maturities for the given date
+
+  /v1/treasury/yields/spread:
+    get:
+      summary: Yield spread over time
+      tags: [Treasury]
+      parameters:
+        - name: long
+          in: query
+          schema:
+            type: string
+            default: "10Y"
+        - name: short
+          in: query
+          schema:
+            type: string
+            default: "2Y"
+        - name: curve_type
+          in: query
+          schema:
+            type: string
+            default: "PAR"
+        - $ref: "#/components/parameters/from"
+        - $ref: "#/components/parameters/to"
+      responses:
+        "200":
+          description: Spread time series with basis points
+
+  /v1/series:
+    get:
+      summary: Search and list available series
+      tags: [Series]
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Search query (matches series ID)
+        - $ref: "#/components/parameters/limit"
+      responses:
+        "200":
+          description: Paginated series list
+
+  /v1/series/{id}:
+    get:
+      summary: Series metadata
+      tags: [Series]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "GDPC1"
+      responses:
+        "200":
+          description: Series metadata
+        "404":
+          description: Series not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+  /v1/series/{id}/observations:
+    get:
+      summary: Get observations for a series
+      description: |
+        Returns the latest values by default. Add `?as_of=DATE` for point-in-time queries —
+        the killer feature that returns what was known at any historical date.
+      tags: [Macro]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "GDPC1"
+        - name: as_of
+          in: query
+          schema:
+            type: string
+            format: date
+          description: |
+            **THE KILLER FEATURE.** Returns observations as they were known on this date.
+            Example: `?as_of=2023-10-26` returns GDP at the advance estimate value.
+        - $ref: "#/components/parameters/from"
+        - $ref: "#/components/parameters/to"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/cursor"
+      responses:
+        "200":
+          description: Observations with optional point-in-time context
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "observation_series"
+                  as_of:
+                    type: string
+                    format: date
+                  series:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      title:
+                        type: string
+                      frequency:
+                        type: string
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Observation"
+
+  /v1/series/{id}/revisions:
+    get:
+      summary: Revision history for one observation
+      description: Returns all vintages (revisions) of a single observation date, ordered by publication date.
+      tags: [Macro]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "GDPC1"
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: The observation date to get revisions for
+          example: "2023-07-01"
+      responses:
+        "200":
+          description: All revisions ordered by as_of_date ascending
+
+tags:
+  - name: Treasury
+    description: U.S. Treasury yield curve data (1990-present, never revised)
+  - name: Macro
+    description: Economic indicators with point-in-time vintage tracking
+  - name: Series
+    description: Series discovery and metadata
+  - name: Auth
+    description: API key validation

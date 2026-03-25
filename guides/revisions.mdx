@@ -1,0 +1,84 @@
+---
+title: "Understanding Data Revisions"
+description: "Economic data gets revised after publication. Track every revision with the MacroData API."
+icon: "code-compare"
+keywords: ["GDP revisions", "vintage macro data", "economic data revisions"]
+---
+
+Economic agencies revise previously published data as better survey responses, tax records, and benchmarks become available. GDP, payrolls, and unemployment all change after initial publication. Some series like the fed funds rate and treasury yields are never revised.
+
+## How GDP revisions work
+
+The Bureau of Economic Analysis (BEA) publishes GDP on a schedule:
+
+<Steps>
+  <Step title="Advance estimate (~30 days)">
+    First look at the quarter. Based on incomplete survey data. This is the number that moves markets.
+  </Step>
+  <Step title="Second estimate (~60 days)">
+    More survey responses incorporated. Typically moves the number by a few billion.
+  </Step>
+  <Step title="Third estimate (~90 days)">
+    Most complete quarterly data. Usually close to the second estimate.
+  </Step>
+  <Step title="Annual revisions (every July)">
+    Incorporates tax data and census benchmarks. Can move numbers by hundreds of billions. Revises the past 3+ years.
+  </Step>
+</Steps>
+
+## Querying revisions
+
+Pass a specific observation date to see every published value:
+
+<CodeGroup>
+```bash cURL
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/series/GDPC1/revisions?date=2023-07-01"
+```
+
+```python Python
+import os, requests
+
+resp = requests.get(
+    "https://api.macrodata.dev/v1/series/GDPC1/revisions",
+    headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+    params={"date": "2023-07-01"}
+)
+for rev in resp.json()["results"]:
+    print(f"{rev['as_of_date']}: {rev['value']}")
+```
+
+```typescript TypeScript
+const resp = await fetch(
+  "https://api.macrodata.dev/v1/series/GDPC1/revisions?date=2023-07-01",
+  { headers: { "X-API-Key": process.env.MACRODATA_API_KEY! } }
+);
+const data = await resp.json();
+data.results.forEach((r: any) => console.log(`${r.as_of_date}: ${r.value}`));
+```
+</CodeGroup>
+
+Results are ordered by publication date ascending:
+
+| Published | Value | What changed |
+|---|---|---|
+| 2023-10-26 | 22,491.567 | Advance estimate |
+| 2023-11-29 | 22,506.365 | +\$14.8B |
+| 2023-12-21 | 22,490.692 | -\$15.7B |
+| 2024-09-26 | 22,780.933 | +\$290.2B (annual revision) |
+| 2025-09-25 | 22,840.989 | +\$60.1B (annual revision) |
+
+## Which series get revised?
+
+| Series | Revised? | Pattern |
+|---|---|---|
+| GDPC1 (GDP) | Yes | 3 estimates + annual revisions |
+| CPIAUCSL (CPI) | Rarely | Seasonal factors updated each February |
+| UNRATE (Unemployment) | Yes | Monthly revisions, annual benchmark |
+| PAYEMS (Payrolls) | Yes | Two monthly revisions + annual benchmark |
+| FEDFUNDS (Fed Funds) | No | Set by the Fed, published once |
+| Treasury yields | No | Market rates, final on the day |
+
+## Revisions + point-in-time
+
+Revisions tell you *how* a data point changed. [Point-in-time queries](/guides/point-in-time) tell you *what was known when*. Use both: `as_of` for backtesting, revisions for understanding how much a number moved.

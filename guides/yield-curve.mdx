@@ -1,0 +1,93 @@
+---
+title: "Treasury Yield Curve"
+description: "Query daily treasury yield rates, build yield curves, and track the 10Y-2Y spread with the MacroData API."
+icon: "chart-line"
+keywords: ["treasury yield curve API", "10Y-2Y spread", "TIPS yields"]
+---
+
+The API serves daily U.S. Treasury yields from 1990 to present. Par curves cover 14 maturities (1M through 30Y). TIPS real yield curves cover 5 maturities from 2003. Treasury data is never revised — each day's rates are final.
+
+## Rates by maturity
+
+Fetch 10-year par yields for a date range:
+
+<CodeGroup>
+```bash cURL
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/treasury/yields?maturity=10Y&from=2026-01-01&to=2026-03-24"
+```
+
+```python Python
+import os, requests
+
+resp = requests.get(
+    "https://api.macrodata.dev/v1/treasury/yields",
+    headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+    params={"maturity": "10Y", "from": "2026-01-01", "to": "2026-03-24"}
+)
+for rate in resp.json()["results"]:
+    print(f"{rate['trade_date']}: {rate['rate']}%")
+```
+
+```typescript TypeScript
+const resp = await fetch(
+  "https://api.macrodata.dev/v1/treasury/yields?maturity=10Y&from=2026-01-01&to=2026-03-24",
+  { headers: { "X-API-Key": process.env.MACRODATA_API_KEY! } }
+);
+const data = await resp.json();
+data.results.forEach((r: any) => console.log(`${r.trade_date}: ${r.rate}%`));
+```
+</CodeGroup>
+
+Available maturities: `1M`, `2M`, `3M`, `4M`, `6M`, `1Y`, `2Y`, `3Y`, `5Y`, `7Y`, `10Y`, `20Y`, `30Y`.
+
+## Full yield curve
+
+Fetch all maturities for a single date:
+
+```bash
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/treasury/yields/curve?date=2026-03-24"
+```
+
+Returns one row per maturity, sorted shortest to longest. Use this to plot the curve or detect inversions.
+
+## The 10Y-2Y spread
+
+The spread endpoint calculates the difference between two maturities:
+
+```bash
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/treasury/yields/spread?long=10Y&short=2Y&from=2025-01-01"
+```
+
+```json Response
+{
+  "object": "spread_series",
+  "results": [
+    {
+      "trade_date": "2026-03-24T00:00:00Z",
+      "long_rate": "4.39",
+      "short_rate": "3.90",
+      "spread_bps": "49.00",
+      "long_maturity": "10Y",
+      "short_maturity": "2Y"
+    }
+  ]
+}
+```
+
+`spread_bps` is in basis points. Positive = normal curve, negative = inverted. The 10Y-2Y spread inverted before every U.S. recession since 1970.
+
+You can compare any two maturities — `long=30Y&short=5Y`, `long=10Y&short=3M`, etc.
+
+## TIPS real yields
+
+Pass `curve_type=TIPS` for inflation-adjusted yields:
+
+```bash
+curl -H "X-API-Key: $MACRODATA_API_KEY" \
+  "https://api.macrodata.dev/v1/treasury/yields?maturity=10Y&curve_type=TIPS&limit=5"
+```
+
+TIPS data covers 5Y, 7Y, 10Y, 20Y, and 30Y from 2003 onward. The spread between par and TIPS yields at the same maturity approximates the market's inflation expectation (breakeven inflation rate).

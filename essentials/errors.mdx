@@ -1,0 +1,73 @@
+---
+title: "Errors"
+description: "MacroData API errors follow RFC 9457 Problem Details with application/problem+json content type."
+icon: "triangle-exclamation"
+---
+
+All errors return [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457) with content type `application/problem+json`.
+
+## Format
+
+```json
+{
+  "type": "https://macrodata.dev/errors/validation-error",
+  "title": "Validation Error",
+  "status": 400,
+  "detail": "invalid 'from' date: use YYYY-MM-DD format",
+  "instance": "/v1/treasury/yields",
+  "request_id": "req_19d22fd0193a..."
+}
+```
+
+| Field | Description |
+|---|---|
+| `type` | URI identifying the error category |
+| `title` | Short summary |
+| `status` | HTTP status code |
+| `detail` | What went wrong in this specific request |
+| `instance` | Request path |
+| `request_id` | Include this in support requests |
+
+## Error types
+
+| Status | Type suffix | Cause |
+|---|---|---|
+| `400` | `validation-error` | Bad parameter value or format |
+| `401` | `unauthorized` | Missing or invalid API key |
+| `404` | `not-found` | Series or resource doesn't exist |
+| `429` | `rate-limit-exceeded` | Daily quota exceeded |
+| `500` | `internal-error` | Server error (rare — if persistent, contact support) |
+
+## Common mistakes
+
+### Wrong date format
+
+```json
+{ "status": 400, "detail": "invalid 'from' date: use YYYY-MM-DD format" }
+```
+
+Dates must be `YYYY-MM-DD`. The API rejects `MM/DD/YYYY`, `2023-1-5`, and ISO timestamps in query parameters.
+
+### Unknown series
+
+```json
+{ "status": 404, "detail": "series 'INVALID' not found" }
+```
+
+Series IDs are uppercase: `GDPC1`, not `gdpc1`. Use `GET /v1/series?q=GDP` to search.
+
+### Missing API key
+
+```json
+{ "status": 401, "detail": "missing X-API-Key header" }
+```
+
+See [Authentication](/essentials/authentication). The header name is `X-API-Key`, not `Authorization`.
+
+### Rate limit exceeded
+
+```json
+{ "status": 429, "detail": "daily limit of 10000 requests exceeded" }
+```
+
+Read the `Retry-After` header for seconds until reset. See [Rate limits](/essentials/rate-limits) for retry strategy.

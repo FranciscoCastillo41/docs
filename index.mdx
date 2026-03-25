@@ -1,97 +1,80 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "MacroData API"
+description: "Point-in-time macro-economic and treasury data API. One query parameter to see what the data said then, not what it says today."
+icon: "house"
+mode: "wide"
 ---
 
-## Setting up
+Every macro data API gives you what the data says **today**.
+MacroData gives you what the data said **then**.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={3}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    First API call in under 2 minutes. Free tier, no credit card.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Point-in-time queries" icon="clock-rotate-left" href="/guides/point-in-time">
+    One parameter to query what the data said on any historical date.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Interactive playground for every endpoint.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## The problem
 
-Everything you need to create world-class documentation.
+GDP published on October 26, 2023: **\$22,491B**. That same quarter revised by September 2025: **\$22,841B**. A \$349 billion gap.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+If your backtest uses today's numbers, it's using information that didn't exist when the trade would have been placed.
 
-## Need inspiration?
+```bash
+# Add ?as_of= to any macro query. That's all it takes.
+curl -H "X-API-Key: YOUR_API_KEY" \
+  "https://api.macrodata.dev/v1/series/GDPC1/observations?as_of=2023-10-26"
+```
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+Returns `"22491.567"` — the advance estimate published that day, not today's revision.
+
+## Data coverage
+
+<CardGroup cols={2}>
+  <Card title="Treasury yields" icon="chart-line">
+    Daily par and TIPS curves. 14 maturities, 1990-present. Spreads in basis points. Never revised.
+  </Card>
+  <Card title="Macro indicators" icon="chart-bar">
+    GDP, CPI, unemployment, payrolls, fed funds, industrial production, housing starts, PCE. Every revision tracked.
+  </Card>
+  <Card title="Point-in-time snapshots" icon="clock-rotate-left">
+    `?as_of=DATE` on any macro series. Returns exactly what was published on that date.
+  </Card>
+  <Card title="Revision history" icon="code-compare">
+    Full audit trail for every data point. See how GDP moved across 5 revisions over 2 years.
+  </Card>
+</CardGroup>
+
+## Design principles
+
+<Tabs>
+  <Tab title="Stripe-inspired envelope">
+    Consistent `object`, `request_id`, `status`, `results` across every endpoint. Cursor pagination. [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) errors. If you've used Stripe's API, this will feel familiar.
+  </Tab>
+  <Tab title="Financial precision">
+    Values are strings — `"4.39"`, never `4.39`. Decimal arithmetic doesn't lose precision in transit. Dates are ISO 8601. No surprises.
+  </Tab>
+  <Tab title="AI-native">
+    Structured JSON with descriptive field names. Fits in context windows. Works as [function calling output](/guides/ai-agents) for Claude, GPT, or any agent framework.
+  </Tab>
+</Tabs>
+
+## Start building
+
+<Steps>
+  <Step title="Get your API key">
+    Sign up at [app.macrodata.dev](https://app.macrodata.dev/signup). Free tier: 500 requests/day, no credit card.
+  </Step>
+  <Step title="Make your first call">
+    Follow the [quickstart](/quickstart) — real economic data in one curl command.
+  </Step>
+  <Step title="Explore point-in-time">
+    Read the [point-in-time guide](/guides/point-in-time) to understand the `as_of` parameter.
+  </Step>
+</Steps>

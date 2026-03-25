@@ -1,0 +1,124 @@
+---
+title: "Python Quickstart"
+description: "Use Python to query macro-economic data, treasury yields, and point-in-time observations from the MacroData API."
+icon: "python"
+iconType: "brands"
+keywords: ["Python economic data API", "Python GDP API", "Python treasury yields"]
+---
+
+All examples use the `requests` library. If you prefer `httpx`, the interface is nearly identical.
+
+## Setup
+
+```bash
+pip install requests
+```
+
+```bash
+export MACRODATA_API_KEY=mda_live_sk_YOUR_KEY_HERE
+```
+
+```python setup.py
+import os
+import requests
+
+API_KEY = os.environ["MACRODATA_API_KEY"]
+BASE = "https://api.macrodata.dev"
+HEADERS = {"X-API-Key": API_KEY}
+```
+
+## Fetch observations
+
+```python
+# Latest 12 months of CPI
+resp = requests.get(f"{BASE}/v1/series/CPIAUCSL/observations", headers=HEADERS, params={"limit": 12})
+data = resp.json()
+
+for obs in data["results"]:
+    print(f"{obs['date'][:10]}  {obs['value']}")
+```
+
+```text Output
+2025-02-01  320.012
+2025-01-01  319.086
+2024-12-01  317.898
+...
+```
+
+## Point-in-time query
+
+```python
+# GDP as known on the day the advance estimate was published
+resp = requests.get(
+    f"{BASE}/v1/series/GDPC1/observations",
+    headers=HEADERS,
+    params={"as_of": "2023-10-26", "limit": 4}
+)
+data = resp.json()
+
+print(f"Snapshot date: {data['as_of']}")
+for obs in data["results"]:
+    print(f"  {obs['date'][:10]}  {obs['value']}  (published {obs['as_of_date'][:10]})")
+```
+
+```text Output
+Snapshot date: 2023-10-26
+  2023-07-01  22491.567  (published 2023-10-26)
+  2023-04-01  22225.35   (published 2023-09-28)
+  2023-01-01  22112.329  (published 2023-09-28)
+  2022-10-01  21989.981  (published 2023-09-28)
+```
+
+## Yield curve
+
+```python
+# Full curve for a specific date
+resp = requests.get(f"{BASE}/v1/treasury/yields/curve", headers=HEADERS, params={"date": "2026-03-24"})
+
+for point in resp.json()["results"]:
+    print(f"  {point['maturity']:>3s}  {point['rate']}%")
+```
+
+```text Output
+   1M  4.32%
+   3M  4.35%
+   2Y  3.90%
+  10Y  4.39%
+  30Y  4.59%
+```
+
+## Pagination helper
+
+Most endpoints return up to 1,000 rows per request. Page through results with `cursor`:
+
+```python helpers.py
+def fetch_all(endpoint, params=None):
+    params = {**(params or {}), "limit": 1000}
+    results = []
+
+    while True:
+        resp = requests.get(f"{BASE}{endpoint}", headers=HEADERS, params=params)
+        data = resp.json()
+        results.extend(data["results"])
+
+        if not data["has_more"]:
+            return results
+        params["cursor"] = data["next_cursor"]
+
+# All 10Y yields for 2025
+yields = fetch_all("/v1/treasury/yields", {"maturity": "10Y", "from": "2025-01-01", "to": "2025-12-31"})
+print(f"{len(yields)} trading days")
+```
+
+## Error handling
+
+```python
+resp = requests.get(f"{BASE}/v1/series/INVALID/observations", headers=HEADERS)
+
+if resp.status_code != 200:
+    error = resp.json()
+    print(f"{error['status']} {error['title']}: {error['detail']}")
+    # 404 Not Found: series 'INVALID' not found
+```
+
+The API returns [RFC 9457 Problem Details](/essentials/errors) for all errors. Check `status` to decide how to handle it — `429` means back off, `400` means fix your request, `401` means check your key.
