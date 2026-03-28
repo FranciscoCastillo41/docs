@@ -1,17 +1,17 @@
 ---
 title: "Quickstart"
-description: "Make your first MacroData API call in under 2 minutes. Get real economic data with one curl command."
+description: "Make your first Vintl API call in under 2 minutes. Get real economic data with one curl command."
 icon: "rocket"
 ---
 
 <Steps>
   <Step title="Get your API key">
-    Sign up at [app.macrodata.dev](https://app.macrodata.dev/signup). Free tier: 500 requests/day, no credit card.
+    Sign up at [app.vintl.io](https://app.vintl.io/signup). Free tier: 500 requests/day, no credit card.
 
-    Your key starts with `mda_live_` — store it in an environment variable.
+    Your key starts with `vntl_live_` — store it in an environment variable.
 
     ```bash
-    export MACRODATA_API_KEY=mda_live_sk_YOUR_KEY_HERE
+    export VINTL_API_KEY=vntl_live_sk_YOUR_KEY_HERE
     ```
   </Step>
   <Step title="Fetch some data">
@@ -19,16 +19,16 @@ icon: "rocket"
 
     <CodeGroup>
     ```bash cURL
-    curl -H "X-API-Key: $MACRODATA_API_KEY" \
-      "https://api.macrodata.dev/v1/series/CPIAUCSL/observations?limit=3"
+    curl -H "X-API-Key: $VINTL_API_KEY" \
+      "https://api.vintl.io/v1/series/CPIAUCSL/observations?limit=3"
     ```
 
     ```python Python
     import os, requests
 
     resp = requests.get(
-        "https://api.macrodata.dev/v1/series/CPIAUCSL/observations",
-        headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+        "https://api.vintl.io/v1/series/CPIAUCSL/observations",
+        headers={"X-API-Key": os.environ["VINTL_API_KEY"]},
         params={"limit": 3}
     )
     print(resp.json())
@@ -36,8 +36,8 @@ icon: "rocket"
 
     ```typescript TypeScript
     const resp = await fetch(
-      "https://api.macrodata.dev/v1/series/CPIAUCSL/observations?limit=3",
-      { headers: { "X-API-Key": process.env.MACRODATA_API_KEY! } }
+      "https://api.vintl.io/v1/series/CPIAUCSL/observations?limit=3",
+      { headers: { "X-API-Key": process.env.VINTL_API_KEY! } }
     );
     console.log(await resp.json());
     ```
@@ -67,18 +67,18 @@ icon: "rocket"
     Values are strings (`"320.012"`) for decimal precision. Every response includes `has_more` and `next_cursor` for [pagination](/essentials/pagination).
   </Step>
   <Step title="Try a point-in-time query">
-    This is what makes MacroData different. Add `?as_of=2023-10-26` to see GDP as it was known the day the advance estimate dropped:
+    This is what makes Vintl different. Add `?as_of=2023-10-26` to see GDP as it was known the day the advance estimate dropped:
 
     <CodeGroup>
     ```bash cURL
-    curl -H "X-API-Key: $MACRODATA_API_KEY" \
-      "https://api.macrodata.dev/v1/series/GDPC1/observations?as_of=2023-10-26&limit=3"
+    curl -H "X-API-Key: $VINTL_API_KEY" \
+      "https://api.vintl.io/v1/series/GDPC1/observations?as_of=2023-10-26&limit=3"
     ```
 
     ```python Python
     resp = requests.get(
-        "https://api.macrodata.dev/v1/series/GDPC1/observations",
-        headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+        "https://api.vintl.io/v1/series/GDPC1/observations",
+        headers={"X-API-Key": os.environ["VINTL_API_KEY"]},
         params={"as_of": "2023-10-26", "limit": 3}
     )
     print(resp.json())
@@ -86,8 +86,8 @@ icon: "rocket"
 
     ```typescript TypeScript
     const resp = await fetch(
-      "https://api.macrodata.dev/v1/series/GDPC1/observations?as_of=2023-10-26&limit=3",
-      { headers: { "X-API-Key": process.env.MACRODATA_API_KEY! } }
+      "https://api.vintl.io/v1/series/GDPC1/observations?as_of=2023-10-26&limit=3",
+      { headers: { "X-API-Key": process.env.VINTL_API_KEY! } }
     );
     console.log(await resp.json());
     ```

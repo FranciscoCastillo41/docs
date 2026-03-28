@@ -31,20 +31,20 @@ curl "https://api.stlouisfed.org/fred/series/observations\
 &output_type=2"
 ```
 
-MacroData wraps the same concept into one parameter:
+Vintl wraps the same concept into one parameter:
 
 <CodeGroup>
 ```bash cURL
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/series/GDPC1/observations?as_of=2023-10-26"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/series/GDPC1/observations?as_of=2023-10-26"
 ```
 
 ```python Python
 import os, requests
 
 resp = requests.get(
-    "https://api.macrodata.dev/v1/series/GDPC1/observations",
-    headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+    "https://api.vintl.io/v1/series/GDPC1/observations",
+    headers={"X-API-Key": os.environ["VINTL_API_KEY"]},
     params={"as_of": "2023-10-26"}
 )
 data = resp.json()
@@ -55,8 +55,8 @@ for obs in data["results"]:
 
 ```typescript TypeScript
 const resp = await fetch(
-  "https://api.macrodata.dev/v1/series/GDPC1/observations?as_of=2023-10-26",
-  { headers: { "X-API-Key": process.env.MACRODATA_API_KEY! } }
+  "https://api.vintl.io/v1/series/GDPC1/observations?as_of=2023-10-26",
+  { headers: { "X-API-Key": process.env.VINTL_API_KEY! } }
 );
 const data = await resp.json();
 
@@ -98,8 +98,8 @@ Without `as_of`, the API returns the latest revised value for each observation.
 Use the revisions endpoint to see how a specific data point changed over time:
 
 ```bash
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/series/GDPC1/revisions?date=2023-07-01"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/series/GDPC1/revisions?date=2023-07-01"
 ```
 
 | Published | Value | What changed |

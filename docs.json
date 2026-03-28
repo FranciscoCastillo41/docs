@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "MacroData API",
+  "name": "Vintl API",
   "description": "Point-in-time macro-economic and treasury data API.",
   "logo": {
     "dark": "/logo/dark.svg",
@@ -8,44 +8,48 @@
     "href": "/"
   },
   "favicon": "/favicon.svg",
-  "theme": "linden",
+  "theme": "maple",
   "appearance": {
-    "default": "dark"
+    "default": "light"
   },
   "colors": {
-    "primary": "#F59E0B",
-    "light": "#FBBF24",
-    "dark": "#D97706"
+    "primary": "#B82F1C",
+    "light": "#D93820",
+    "dark": "#8B2015"
   },
   "background": {
-    "decoration": "windows"
+    "color": {
+      "light": "#F5F0E6",
+      "dark": "#100D0A"
+    }
   },
   "fonts": {
     "heading": {
-      "family": "Inter",
-      "weight": 700
+      "family": "Playfair Display",
+      "weight": 500
     },
     "body": {
-      "family": "Inter",
-      "weight": 400
+      "family": "Instrument Sans",
+      "weight": 300
     }
   },
   "styling": {
-    "codeblocks": "dark"
+    "codeblocks": "dark",
+    "css": "/global.css"
   },
   "search": {
     "prompt": "Search docs..."
   },
   "thumbnails": {
-    "appearance": "dark",
+    "appearance": "light",
     "fonts": {
-      "family": "Inter"
+      "family": "Playfair Display"
     }
   },
   "seo": {
     "indexing": "navigable",
     "metatags": {
-      "og:site_name": "MacroData API Docs",
+      "og:site_name": "Vintl API Docs",
       "twitter:card": "summary_large_image"
     }
   },
@@ -54,12 +58,12 @@
   },
   "topbar": {
     "links": [
-      { "name": "Dashboard", "url": "https://app.macrodata.dev" },
-      { "name": "Status", "url": "https://status.macrodata.dev" }
+      { "name": "Dashboard", "url": "https://app.vintl.io" },
+      { "name": "Status", "url": "https://status.vintl.io" }
     ],
     "cta": {
       "name": "Get API Key",
-      "url": "https://app.macrodata.dev/signup"
+      "url": "https://app.vintl.io/signup"
     }
   },
   "navigation": {
@@ -104,7 +108,7 @@
     ]
   },
   "api": {
-    "baseUrl": "https://api.macrodata.dev",
+    "baseUrl": "https://api.vintl.io",
     "auth": {
       "method": "key",
       "name": "X-API-Key"

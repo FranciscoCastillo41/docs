@@ -1,14 +1,14 @@
-# MacroData API — Developer Documentation
+# Vintl API — Developer Documentation
 
 ## What This Is
 
-Mintlify Pro documentation site for MacroData API (`docs.macrodata.dev`).
+Mintlify Pro documentation site for Vintl API (`docs.vintl.io`).
 MDX content pushed to GitHub, Mintlify auto-deploys on merge to `main`.
 
 ## Architecture
 
 ```
-MDX files + docs.json → GitHub → Mintlify → docs.macrodata.dev
+MDX files + docs.json → GitHub → Mintlify → docs.vintl.io
 OpenAPI spec (v1.yaml) → Mintlify → auto-generated API reference
 ```
 
@@ -28,18 +28,18 @@ This docs site is one piece of a larger platform:
 |---|---|---|
 | `market-data-api` | Built (v1) | Go REST API — treasury, macro, point-in-time |
 | `market-data-pipeline` | Built | Python pipeline — ingests FRED, Treasury.gov into TimescaleDB |
-| `market-data-docs` | **This repo** | Mintlify docs at docs.macrodata.dev |
+| `market-data-docs` | **This repo** | Mintlify docs at docs.vintl.io |
 | `market-data-dashboard` | Not built | Next.js + Supabase — signup, API keys, billing |
 | `market-data-sdk` | Not built | Python SDK — `pip install macrodata`, returns polars DataFrames |
 | `market-data-mcp` | Not built | MCP server for Claude/GPT function calling |
-| `macrodata.dev` | Not built | Marketing landing page |
+| `vintl.io` | Not built | Marketing landing page |
 
 ## What This Repo Does NOT Contain
 
 - No backend code. No API logic. No database schemas.
 - No SDK code (that will be `market-data-sdk`).
 - No dashboard/signup (that will be `market-data-dashboard`).
-- No landing page (that will be `macrodata.dev` root).
+- No landing page (that will be `vintl.io` root).
 
 ## OpenAPI Spec Sync
 
@@ -137,7 +137,7 @@ Before creating a PR, verify:
 
 ## Domains
 
-- `docs.macrodata.dev` — this site (CNAME to Mintlify)
-- `api.macrodata.dev` — the API (separate repo)
-- `app.macrodata.dev` — dashboard (separate repo, not built yet)
-- `macrodata.dev` — landing page (separate, not built yet)
+- `docs.vintl.io` — this site (CNAME to Mintlify)
+- `api.vintl.io` — the API (separate repo)
+- `app.vintl.io` — dashboard (separate repo, not built yet)
+- `vintl.io` — landing page (separate, not built yet)

@@ -1,6 +1,6 @@
 ---
 title: "Authentication"
-description: "Authenticate with the MacroData API using an API key in the X-API-Key header."
+description: "Authenticate with the Vintl API using an API key in the X-API-Key header."
 icon: "lock"
 ---
 
@@ -8,35 +8,35 @@ Every `/v1/*` endpoint requires an API key in the `X-API-Key` header.
 
 ## Get your key
 
-Sign up at [app.macrodata.dev](https://app.macrodata.dev/signup). Your key is shown once at creation — copy it immediately. We store a SHA-256 hash only (the Stripe model — if you lose the key, generate a new one).
+Sign up at [app.vintl.io](https://app.vintl.io/signup). Your key is shown once at creation — copy it immediately. We store a SHA-256 hash only (the Stripe model — if you lose the key, generate a new one).
 
 ```
-mda_live_sk_7f3a9b2c1d4e5f6a7b8c9d0e1f2a3b4c
+vntl_live_sk_7f3a9b2c1d4e5f6a7b8c9d0e1f2a3b4c
 ```
 
-The `mda_live_` prefix identifies it as a MacroData production key.
+The `vntl_live_` prefix identifies it as a Vintl production key.
 
 ## Send your key
 
 <CodeGroup>
 ```bash cURL
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/ping"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/ping"
 ```
 
 ```python Python
 import os, requests
 
 resp = requests.get(
-    "https://api.macrodata.dev/v1/ping",
-    headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]}
+    "https://api.vintl.io/v1/ping",
+    headers={"X-API-Key": os.environ["VINTL_API_KEY"]}
 )
 print(resp.json())
 ```
 
 ```typescript TypeScript
-const resp = await fetch("https://api.macrodata.dev/v1/ping", {
-  headers: { "X-API-Key": process.env.MACRODATA_API_KEY! },
+const resp = await fetch("https://api.vintl.io/v1/ping", {
+  headers: { "X-API-Key": process.env.VINTL_API_KEY! },
 });
 console.log(await resp.json());
 ```
@@ -59,7 +59,7 @@ Missing header returns `401`:
 
 ```json
 {
-  "type": "https://macrodata.dev/errors/unauthorized",
+  "type": "https://vintl.io/errors/unauthorized",
   "title": "Unauthorized",
   "status": 401,
   "detail": "missing X-API-Key header",
@@ -78,8 +78,8 @@ Never commit your API key to version control. Use environment variables or a sec
 
 | Do | Don't |
 |---|---|
-| `export MACRODATA_API_KEY=mda_live_sk_...` | Hardcode the key in source |
-| `os.environ["MACRODATA_API_KEY"]` | Pass the key as a URL parameter |
+| `export VINTL_API_KEY=vntl_live_sk_...` | Hardcode the key in source |
+| `os.environ["VINTL_API_KEY"]` | Pass the key as a URL parameter |
 | Add `.env` to `.gitignore` | Commit `.env` files |
 | Rotate keys quarterly in the dashboard | Share keys across environments |
 

@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm *)",
+      "Bash(npx *)",
+      "Bash(next *)",
+      "Bash(vitest *)",
+      "Bash(playwright *)",
+      "Bash(supabase *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(git switch*)",
+      "Bash(git push*)",
+      "Bash(git merge*)",
+      "Bash(gh pr *)",
+      "Bash(gh issue *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(curl *)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf *)",
+      "Bash(*SUPABASE_SERVICE_ROLE_KEY*)",
+      "Bash(*STRIPE_SECRET_KEY*)",
+      "Bash(*INTERNAL_API_TOKEN*)"
+    ]
+  }
+}

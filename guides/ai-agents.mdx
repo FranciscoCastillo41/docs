@@ -1,11 +1,11 @@
 ---
 title: "AI Agents and Function Calling"
-description: "Use the MacroData API as a tool for LLM agents, MCP servers, and function calling."
+description: "Use the Vintl API as a tool for LLM agents, MCP servers, and function calling."
 icon: "microchip-ai"
 keywords: ["MCP economic data", "LLM function calling", "AI macro data tool"]
 ---
 
-MacroData responses are designed to work as function calling output. String-typed values avoid floating-point ambiguity in LLM reasoning, and the consistent envelope fits in context windows without preprocessing.
+Vintl responses are designed to work as function calling output. String-typed values avoid floating-point ambiguity in LLM reasoning, and the consistent envelope fits in context windows without preprocessing.
 
 ## Tool definition
 
@@ -54,8 +54,8 @@ def query_economic_data(series_id: str, as_of: str = None, limit: int = 5) -> di
         params["as_of"] = as_of
 
     resp = requests.get(
-        f"https://api.macrodata.dev/v1/series/{series_id}/observations",
-        headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+        f"https://api.vintl.io/v1/series/{series_id}/observations",
+        headers={"X-API-Key": os.environ["VINTL_API_KEY"]},
         params=params
     )
     return resp.json()
@@ -72,8 +72,8 @@ def query_yield_curve(date: str = None) -> dict:
         params["date"] = date
 
     resp = requests.get(
-        "https://api.macrodata.dev/v1/treasury/yields/curve",
-        headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+        "https://api.vintl.io/v1/treasury/yields/curve",
+        headers={"X-API-Key": os.environ["VINTL_API_KEY"]},
         params=params
     )
     return resp.json()

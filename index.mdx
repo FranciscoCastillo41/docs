@@ -1,12 +1,12 @@
 ---
-title: "MacroData API"
+title: "Vintl API"
 description: "Point-in-time macro-economic and treasury data API. One query parameter to see what the data said then, not what it says today."
 icon: "house"
 mode: "wide"
 ---
 
 Every macro data API gives you what the data says **today**.
-MacroData gives you what the data said **then**.
+Vintl gives you what the data said **then**.
 
 <CardGroup cols={3}>
   <Card title="Quickstart" icon="rocket" href="/quickstart">
@@ -29,7 +29,7 @@ If your backtest uses today's numbers, it's using information that didn't exist 
 ```bash
 # Add ?as_of= to any macro query. That's all it takes.
 curl -H "X-API-Key: YOUR_API_KEY" \
-  "https://api.macrodata.dev/v1/series/GDPC1/observations?as_of=2023-10-26"
+  "https://api.vintl.io/v1/series/GDPC1/observations?as_of=2023-10-26"
 ```
 
 Returns `"22491.567"` — the advance estimate published that day, not today's revision.
@@ -69,7 +69,7 @@ Returns `"22491.567"` — the advance estimate published that day, not today's r
 
 <Steps>
   <Step title="Get your API key">
-    Sign up at [app.macrodata.dev](https://app.macrodata.dev/signup). Free tier: 500 requests/day, no credit card.
+    Sign up at [app.vintl.io](https://app.vintl.io/signup). Free tier: 500 requests/day, no credit card.
   </Step>
   <Step title="Make your first call">
     Follow the [quickstart](/quickstart) — real economic data in one curl command.

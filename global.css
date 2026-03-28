@@ -1,0 +1,408 @@
+/* ═══════════════════════════════════════════════════
+   Vintl Editorial Theme for Mintlify
+   Matches vintl.io landing page aesthetic
+   ═══════════════════════════════════════════════════ */
+
+/* ── Import Departure Mono (not available in Mintlify font config) ── */
+@import url('https://fonts.googleapis.com/css2?family=Departure+Mono&display=swap');
+
+/* ── Design Tokens (from vintl.io :root) ── */
+:root {
+  --paper:    #F5F0E6;
+  --paper2:   #EDE8DC;
+  --paper3:   #E4DFCF;
+  --ink:      #100D0A;
+  --ink2:     #2A2520;
+  --red:      #B82F1C;
+  --red2:     #D93820;
+  --red-dim:  rgba(184, 47, 28, 0.1);
+  --warm:     #7A7165;
+  --muted:    #A09890;
+  --line:     rgba(16, 13, 10, 0.1);
+  --line2:    rgba(16, 13, 10, 0.06);
+  --code-bg:  #141210;
+}
+
+/* ── Global: font smoothing like the landing page ── */
+body {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* ── Typography: match the editorial hierarchy ── */
+
+/* Headings: Playfair Display 400/500, tight tracking */
+h1, h2, h3 {
+  letter-spacing: -0.02em !important;
+  font-weight: 400 !important;
+  line-height: 1.08 !important;
+}
+
+h1 {
+  font-size: clamp(2rem, 3.5vw, 2.8rem) !important;
+  line-height: 1.05 !important;
+}
+
+h2 {
+  font-size: clamp(1.4rem, 2.5vw, 1.8rem) !important;
+}
+
+h3 {
+  font-size: 1.15rem !important;
+  font-weight: 500 !important;
+}
+
+/* Body: Instrument Sans 300, warm ink color */
+p, li, td {
+  font-weight: 300 !important;
+  line-height: 1.7 !important;
+}
+
+/* Monospace: Departure Mono everywhere */
+pre, code, kbd, samp,
+[class*="mono"], [class*="Mono"],
+[class*="code"], [class*="Code"] {
+  font-family: 'Departure Mono', 'Courier New', monospace !important;
+}
+
+pre code {
+  font-size: 0.72rem !important;
+  line-height: 1.85 !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* ══════════════════════════════════
+   LIGHT MODE (cream paper editorial)
+   ══════════════════════════════════ */
+
+/* Body text */
+[data-theme="light"] p,
+[data-theme="light"] li {
+  color: var(--ink2) !important;
+}
+
+[data-theme="light"] [class*="description"],
+[data-theme="light"] [class*="subtitle"],
+[data-theme="light"] [class*="Description"] {
+  color: var(--warm) !important;
+}
+
+/* ── Sidebar: cream paper ── */
+[data-theme="light"] aside,
+[data-theme="light"] [class*="sidebar"],
+[data-theme="light"] [class*="Sidebar"],
+[data-theme="light"] nav[class*="Nav"],
+[data-theme="light"] [class*="navigation"] {
+  background-color: var(--paper2) !important;
+  border-color: var(--line) !important;
+}
+
+/* Sidebar active item: red accent like your nav */
+[data-theme="light"] [class*="active"],
+[data-theme="light"] [aria-current="page"] {
+  color: var(--red) !important;
+}
+
+/* ── Topbar / Navbar ── */
+[data-theme="light"] header,
+[data-theme="light"] [class*="topbar"],
+[data-theme="light"] [class*="Topbar"],
+[data-theme="light"] [class*="header"] {
+  background: rgba(245, 240, 230, 0.94) !important;
+  backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+/* ── Links: red accent with subtle underline (like .btn-ghost) ── */
+[data-theme="light"] a:not([class*="btn"]):not([class*="Button"]):not([class*="nav"]):not([class*="Nav"]):not([class*="card"]):not([class*="Card"]):not([class*="sidebar"]):not([class*="Sidebar"]) {
+  color: var(--red) !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(184, 47, 28, 0.15);
+  transition: border-color 0.18s, color 0.18s;
+}
+
+[data-theme="light"] a:not([class*="btn"]):not([class*="Button"]):not([class*="nav"]):not([class*="Nav"]):not([class*="card"]):not([class*="Card"]):not([class*="sidebar"]):not([class*="Sidebar"]):hover {
+  border-color: var(--red) !important;
+  color: var(--ink) !important;
+}
+
+/* ── Cards: paper bg, 1px border, 3px radius (like .correction-doc) ── */
+[data-theme="light"] [class*="Card"],
+[data-theme="light"] [class*="card"] {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 3px !important;
+  box-shadow: 2px 4px 16px rgba(16, 13, 10, 0.04) !important;
+  transition: background 0.25s, border-color 0.25s !important;
+}
+
+[data-theme="light"] [class*="Card"]:hover,
+[data-theme="light"] [class*="card"]:hover {
+  background: var(--paper2) !important;
+  border-color: rgba(16, 13, 10, 0.18) !important;
+}
+
+/* Card titles: serif */
+[data-theme="light"] [class*="Card"] h3,
+[data-theme="light"] [class*="card"] h3 {
+  font-weight: 400 !important;
+}
+
+/* ── Code blocks: ink-dark like your .code-pane (#0C0A08) ── */
+[data-theme="light"] pre {
+  background: #0C0A08 !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  border-radius: 4px !important;
+  box-shadow: 4px 8px 32px rgba(16, 13, 10, 0.08) !important;
+}
+
+/* Code block topbar (language label) */
+[data-theme="light"] [class*="CodeGroup"] [class*="tab"],
+[data-theme="light"] [class*="codegroup"] [class*="tab"] {
+  font-family: 'Departure Mono', monospace !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: lowercase !important;
+}
+
+/* ── Inline code: red-tinted like your .data-tag ── */
+[data-theme="light"] :not(pre) > code {
+  background: var(--red-dim) !important;
+  color: var(--red) !important;
+  border: 1px solid rgba(184, 47, 28, 0.15) !important;
+  border-radius: 2px !important;
+  padding: 1px 6px !important;
+  font-size: 0.82em !important;
+  font-weight: 400 !important;
+}
+
+/* ── Tables: editorial monospace headers (like .doc-header) ── */
+[data-theme="light"] table {
+  border-collapse: collapse !important;
+}
+
+[data-theme="light"] thead {
+  border-bottom: 1px solid var(--line) !important;
+}
+
+[data-theme="light"] th {
+  font-family: 'Departure Mono', monospace !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+  font-weight: 400 !important;
+  padding-bottom: 10px !important;
+}
+
+[data-theme="light"] td {
+  border-bottom: 1px solid var(--line2) !important;
+  color: var(--ink2) !important;
+  font-size: 0.88rem !important;
+}
+
+/* ── Callouts: match your compare-box styling ── */
+[data-theme="light"] [class*="Warning"],
+[data-theme="light"] [class*="warning"] {
+  background: rgba(184, 47, 28, 0.04) !important;
+  border: 1px solid rgba(184, 47, 28, 0.18) !important;
+  border-radius: 3px !important;
+  border-left: 2px solid var(--red) !important;
+}
+
+[data-theme="light"] [class*="Tip"],
+[data-theme="light"] [class*="tip"],
+[data-theme="light"] [class*="Note"],
+[data-theme="light"] [class*="note"] {
+  background: rgba(16, 13, 10, 0.025) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 3px !important;
+  border-left: 2px solid var(--warm) !important;
+}
+
+/* ── Tabs: red underline for active (like your nav) ── */
+[data-theme="light"] [role="tab"][aria-selected="true"],
+[data-theme="light"] [class*="Tab"][aria-selected="true"] {
+  color: var(--ink) !important;
+  border-color: var(--red) !important;
+  font-weight: 400 !important;
+}
+
+[data-theme="light"] [role="tab"],
+[data-theme="light"] [class*="Tab"] {
+  font-family: 'Departure Mono', monospace !important;
+  font-size: 0.7rem !important;
+  letter-spacing: 0.06em !important;
+  text-transform: lowercase !important;
+  color: var(--warm) !important;
+  transition: color 0.2s !important;
+}
+
+[data-theme="light"] [role="tab"]:hover,
+[data-theme="light"] [class*="Tab"]:hover {
+  color: var(--ink) !important;
+}
+
+/* ── Steps: red accent dots ── */
+[data-theme="light"] [class*="Step"] [class*="icon"],
+[data-theme="light"] [class*="step"] [class*="number"] {
+  background: var(--red) !important;
+  color: var(--paper) !important;
+}
+
+/* ── CTA button: ink bg, 2px radius (like .btn-ink) ── */
+[data-theme="light"] [class*="cta"],
+[data-theme="light"] [class*="Cta"],
+[data-theme="light"] button[class*="primary"] {
+  background: var(--ink) !important;
+  color: var(--paper) !important;
+  border-radius: 2px !important;
+  font-family: 'Departure Mono', monospace !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.06em !important;
+  transition: background 0.18s !important;
+}
+
+[data-theme="light"] [class*="cta"]:hover,
+[data-theme="light"] [class*="Cta"]:hover,
+[data-theme="light"] button[class*="primary"]:hover {
+  background: var(--red) !important;
+}
+
+/* ── Dividers ── */
+[data-theme="light"] hr,
+[data-theme="light"] [class*="divider"],
+[data-theme="light"] [class*="Divider"] {
+  border-color: var(--line) !important;
+}
+
+/* ── Search ── */
+[data-theme="light"] [class*="search"] input,
+[data-theme="light"] [class*="Search"] input {
+  background: var(--paper2) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 3px !important;
+  font-family: 'Departure Mono', monospace !important;
+  font-size: 0.72rem !important;
+}
+
+/* ── TOC (right sidebar) ── */
+[data-theme="light"] [class*="toc"] a,
+[data-theme="light"] [class*="Toc"] a,
+[data-theme="light"] [class*="tableOfContents"] a {
+  color: var(--muted) !important;
+  font-size: 0.78rem !important;
+  border-bottom: none !important;
+  transition: color 0.18s !important;
+}
+
+[data-theme="light"] [class*="toc"] a:hover,
+[data-theme="light"] [class*="Toc"] a:hover,
+[data-theme="light"] [class*="tableOfContents"] a:hover {
+  color: var(--ink) !important;
+}
+
+/* Active TOC item */
+[data-theme="light"] [class*="toc"] [class*="active"],
+[data-theme="light"] [class*="Toc"] [class*="active"] {
+  color: var(--red) !important;
+  border-left-color: var(--red) !important;
+}
+
+/* ── Pagination / nav links at bottom ── */
+[data-theme="light"] [class*="pagination"],
+[data-theme="light"] [class*="Pagination"] {
+  border-top: 1px solid var(--line) !important;
+}
+
+/* ── Badges / Tags ── */
+[data-theme="light"] [class*="badge"],
+[data-theme="light"] [class*="Badge"],
+[data-theme="light"] [class*="tag"],
+[data-theme="light"] [class*="Tag"] {
+  font-family: 'Departure Mono', monospace !important;
+  font-size: 0.58rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  border-radius: 2px !important;
+}
+
+/* ── Scrollbar ── */
+[data-theme="light"] ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: var(--paper2);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(16, 13, 10, 0.12);
+  border-radius: 3px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 13, 10, 0.22);
+}
+
+/* ══════════════════════════════════
+   DARK MODE (ink aesthetic)
+   ══════════════════════════════════ */
+
+[data-theme="dark"] {
+  --paper:   #100D0A;
+  --paper2:  #1A1714;
+  --paper3:  #211E1A;
+  --ink:     #F0EAE0;
+  --ink2:    #C5BEB0;
+  --warm:    #8A8378;
+  --muted:   #5A544C;
+  --line:    rgba(255, 255, 255, 0.06);
+  --line2:   rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] pre {
+  background: #0C0A08 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-theme="dark"] :not(pre) > code {
+  background: rgba(184, 47, 28, 0.15) !important;
+  color: var(--red2) !important;
+  border: 1px solid rgba(184, 47, 28, 0.25) !important;
+}
+
+[data-theme="dark"] th {
+  font-family: 'Departure Mono', monospace !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--warm) !important;
+}
+
+/* ══════════════════════════════════
+   SUBTLE PAPER TEXTURE (from landing page)
+   ══════════════════════════════════ */
+[data-theme="light"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(16, 13, 10, 0.006) 3px,
+      rgba(16, 13, 10, 0.006) 4px
+    );
+}
+
+/* ══════════════════════════════════
+   GLOBAL TRANSITIONS (like landing page 0.18s ease)
+   ══════════════════════════════════ */
+a, button, [role="tab"], [class*="Card"], [class*="card"] {
+  transition: all 0.18s ease !important;
+}

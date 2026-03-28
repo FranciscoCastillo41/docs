@@ -1,6 +1,6 @@
 ---
 title: "Python Quickstart"
-description: "Use Python to query macro-economic data, treasury yields, and point-in-time observations from the MacroData API."
+description: "Use Python to query macro-economic data, treasury yields, and point-in-time observations from the Vintl API."
 icon: "python"
 iconType: "brands"
 keywords: ["Python economic data API", "Python GDP API", "Python treasury yields"]
@@ -15,15 +15,15 @@ pip install requests
 ```
 
 ```bash
-export MACRODATA_API_KEY=mda_live_sk_YOUR_KEY_HERE
+export VINTL_API_KEY=vntl_live_sk_YOUR_KEY_HERE
 ```
 
 ```python setup.py
 import os
 import requests
 
-API_KEY = os.environ["MACRODATA_API_KEY"]
-BASE = "https://api.macrodata.dev"
+API_KEY = os.environ["VINTL_API_KEY"]
+BASE = "https://api.vintl.io"
 HEADERS = {"X-API-Key": API_KEY}
 ```
 

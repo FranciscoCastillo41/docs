@@ -1,6 +1,6 @@
 ---
 title: "Understanding Data Revisions"
-description: "Economic data gets revised after publication. Track every revision with the MacroData API."
+description: "Economic data gets revised after publication. Track every revision with the Vintl API."
 icon: "code-compare"
 keywords: ["GDP revisions", "vintage macro data", "economic data revisions"]
 ---
@@ -32,16 +32,16 @@ Pass a specific observation date to see every published value:
 
 <CodeGroup>
 ```bash cURL
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/series/GDPC1/revisions?date=2023-07-01"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/series/GDPC1/revisions?date=2023-07-01"
 ```
 
 ```python Python
 import os, requests
 
 resp = requests.get(
-    "https://api.macrodata.dev/v1/series/GDPC1/revisions",
-    headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+    "https://api.vintl.io/v1/series/GDPC1/revisions",
+    headers={"X-API-Key": os.environ["VINTL_API_KEY"]},
     params={"date": "2023-07-01"}
 )
 for rev in resp.json()["results"]:
@@ -50,8 +50,8 @@ for rev in resp.json()["results"]:
 
 ```typescript TypeScript
 const resp = await fetch(
-  "https://api.macrodata.dev/v1/series/GDPC1/revisions?date=2023-07-01",
-  { headers: { "X-API-Key": process.env.MACRODATA_API_KEY! } }
+  "https://api.vintl.io/v1/series/GDPC1/revisions?date=2023-07-01",
+  { headers: { "X-API-Key": process.env.VINTL_API_KEY! } }
 );
 const data = await resp.json();
 data.results.forEach((r: any) => console.log(`${r.as_of_date}: ${r.value}`));

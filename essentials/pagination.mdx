@@ -1,6 +1,6 @@
 ---
 title: "Pagination"
-description: "MacroData API uses cursor-based pagination with has_more and next_cursor fields."
+description: "Vintl API uses cursor-based pagination with has_more and next_cursor fields."
 icon: "arrow-right-arrow-left"
 ---
 
@@ -30,24 +30,24 @@ All list endpoints return paginated results. The default page size is 100, max i
 <CodeGroup>
 ```bash cURL
 # First page
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/treasury/yields?limit=100"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/treasury/yields?limit=100"
 
 # Next page — use next_cursor from previous response
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/treasury/yields?limit=100&cursor=2025-01-15"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/treasury/yields?limit=100&cursor=2025-01-15"
 ```
 
 ```python Python
 import os, requests
 
-headers = {"X-API-Key": os.environ["MACRODATA_API_KEY"]}
+headers = {"X-API-Key": os.environ["VINTL_API_KEY"]}
 params = {"limit": 100}
 all_results = []
 
 while True:
     resp = requests.get(
-        "https://api.macrodata.dev/v1/treasury/yields",
+        "https://api.vintl.io/v1/treasury/yields",
         headers=headers, params=params
     )
     data = resp.json()
@@ -59,8 +59,8 @@ while True:
 ```
 
 ```typescript TypeScript
-const headers = { "X-API-Key": process.env.MACRODATA_API_KEY! };
-const base = "https://api.macrodata.dev/v1/treasury/yields";
+const headers = { "X-API-Key": process.env.VINTL_API_KEY! };
+const base = "https://api.vintl.io/v1/treasury/yields";
 const allResults: any[] = [];
 let cursor: string | undefined;
 

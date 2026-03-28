@@ -1,6 +1,6 @@
 ---
 title: "Treasury Yield Curve"
-description: "Query daily treasury yield rates, build yield curves, and track the 10Y-2Y spread with the MacroData API."
+description: "Query daily treasury yield rates, build yield curves, and track the 10Y-2Y spread with the Vintl API."
 icon: "chart-line"
 keywords: ["treasury yield curve API", "10Y-2Y spread", "TIPS yields"]
 ---
@@ -13,16 +13,16 @@ Fetch 10-year par yields for a date range:
 
 <CodeGroup>
 ```bash cURL
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/treasury/yields?maturity=10Y&from=2026-01-01&to=2026-03-24"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/treasury/yields?maturity=10Y&from=2026-01-01&to=2026-03-24"
 ```
 
 ```python Python
 import os, requests
 
 resp = requests.get(
-    "https://api.macrodata.dev/v1/treasury/yields",
-    headers={"X-API-Key": os.environ["MACRODATA_API_KEY"]},
+    "https://api.vintl.io/v1/treasury/yields",
+    headers={"X-API-Key": os.environ["VINTL_API_KEY"]},
     params={"maturity": "10Y", "from": "2026-01-01", "to": "2026-03-24"}
 )
 for rate in resp.json()["results"]:
@@ -31,8 +31,8 @@ for rate in resp.json()["results"]:
 
 ```typescript TypeScript
 const resp = await fetch(
-  "https://api.macrodata.dev/v1/treasury/yields?maturity=10Y&from=2026-01-01&to=2026-03-24",
-  { headers: { "X-API-Key": process.env.MACRODATA_API_KEY! } }
+  "https://api.vintl.io/v1/treasury/yields?maturity=10Y&from=2026-01-01&to=2026-03-24",
+  { headers: { "X-API-Key": process.env.VINTL_API_KEY! } }
 );
 const data = await resp.json();
 data.results.forEach((r: any) => console.log(`${r.trade_date}: ${r.rate}%`));
@@ -46,8 +46,8 @@ Available maturities: `1M`, `2M`, `3M`, `4M`, `6M`, `1Y`, `2Y`, `3Y`, `5Y`, `7Y`
 Fetch all maturities for a single date:
 
 ```bash
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/treasury/yields/curve?date=2026-03-24"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/treasury/yields/curve?date=2026-03-24"
 ```
 
 Returns one row per maturity, sorted shortest to longest. Use this to plot the curve or detect inversions.
@@ -57,8 +57,8 @@ Returns one row per maturity, sorted shortest to longest. Use this to plot the c
 The spread endpoint calculates the difference between two maturities:
 
 ```bash
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/treasury/yields/spread?long=10Y&short=2Y&from=2025-01-01"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/treasury/yields/spread?long=10Y&short=2Y&from=2025-01-01"
 ```
 
 ```json Response
@@ -86,8 +86,8 @@ You can compare any two maturities — `long=30Y&short=5Y`, `long=10Y&short=3M`,
 Pass `curve_type=TIPS` for inflation-adjusted yields:
 
 ```bash
-curl -H "X-API-Key: $MACRODATA_API_KEY" \
-  "https://api.macrodata.dev/v1/treasury/yields?maturity=10Y&curve_type=TIPS&limit=5"
+curl -H "X-API-Key: $VINTL_API_KEY" \
+  "https://api.vintl.io/v1/treasury/yields?maturity=10Y&curve_type=TIPS&limit=5"
 ```
 
 TIPS data covers 5Y, 7Y, 10Y, 20Y, and 30Y from 2003 onward. The spread between par and TIPS yields at the same maturity approximates the market's inflation expectation (breakeven inflation rate).
