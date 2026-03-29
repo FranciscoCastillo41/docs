@@ -11,8 +11,8 @@ Breaking this file breaks the deployment. (Migrated from legacy mint.json.)
 ## Required Fields
 
 - `$schema` must be `"https://mintlify.com/docs.json"`
-- `name` must be `"MacroData API"`
-- `api.baseUrl` must be `"https://api.macrodata.dev"`
+- `name` must be `"Vintl API"`
+- `api.baseUrl` must be `"https://api.vintl.io"`
 - `api.auth.method` must be `"key"`
 - `api.auth.name` must be `"X-API-Key"`
 - API Reference tab must have `"openapi": "openapi/v1.yaml"` for auto-generation

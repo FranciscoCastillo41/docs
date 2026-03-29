@@ -19,7 +19,7 @@ Run all three audit agents and compile a unified report.
 ## Output Format
 
 ```
-# Audit Report — MacroData Dashboard
+# Audit Report — Vintl Dashboard
 
 ## Security
 [output from security-reviewer]

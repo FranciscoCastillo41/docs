@@ -48,14 +48,14 @@ description: "<Description under 160 chars with target keyword>"
 <CodeGroup>
 ```bash cURL
 curl -H "X-API-Key: YOUR_API_KEY" \
-  "https://api.macrodata.dev/v1/..."
+  "https://api.vintl.io/v1/..."
 ```
 
 ```python Python
 import requests
 
 resp = requests.get(
-    "https://api.macrodata.dev/v1/...",
+    "https://api.vintl.io/v1/...",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={...}
 )
@@ -64,7 +64,7 @@ data = resp.json()
 
 ```typescript TypeScript
 const resp = await fetch(
-  "https://api.macrodata.dev/v1/...?...",
+  "https://api.vintl.io/v1/...?...",
   { headers: { "X-API-Key": "YOUR_API_KEY" } }
 );
 const data = await resp.json();

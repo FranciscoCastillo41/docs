@@ -10,7 +10,7 @@ tools:
 
 # Accuracy Checker
 
-You cross-reference MacroData API documentation against the OpenAPI spec
+You cross-reference Vintl API documentation against the OpenAPI spec
 (`openapi/v1.yaml`) to find mismatches, missing documentation, and errors.
 
 ## Process

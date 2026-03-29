@@ -10,7 +10,7 @@ tools:
 
 # Performance Auditor
 
-You audit the MacroData dashboard for Next.js performance anti-patterns.
+You audit the Vintl dashboard for Next.js performance anti-patterns.
 
 ## Process
 

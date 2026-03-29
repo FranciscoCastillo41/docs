@@ -11,7 +11,7 @@ paths:
 Use the shared design tokens from `tailwind.config.ts`. Never hardcode colors.
 
 ```
-Primary: #F59E0B (amber) — matches docs.macrodata.dev
+Primary: #F59E0B (amber) — matches docs.vintl.io
 Light:   #FBBF24
 Dark:    #D97706
 Font:    Inter

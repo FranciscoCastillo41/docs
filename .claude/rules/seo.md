@@ -28,7 +28,7 @@ sidebarTitle: "Point-in-Time (as_of)"
 WRONG:
 ```yaml
 ---
-title: "Point-in-Time Queries — MacroData API Documentation for Historical Vintage Data Access"
+title: "Point-in-Time Queries — Vintl API Documentation for Historical Vintage Data Access"
 description: "docs"
 ---
 ```

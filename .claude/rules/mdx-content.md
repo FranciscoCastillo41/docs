@@ -79,7 +79,7 @@ WRONG:
 ## Links and References
 
 - Internal links use relative paths: `[point-in-time](/guides/point-in-time)`
-- Never use full URLs for internal links: not `https://docs.macrodata.dev/guides/...`
+- Never use full URLs for internal links: not `https://docs.vintl.io/guides/...`
 - Cross-link between guides and API reference pages
 - Every guide should link to the relevant API reference endpoint
 

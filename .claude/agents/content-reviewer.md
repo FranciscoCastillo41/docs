@@ -10,7 +10,7 @@ tools:
 
 # Content Reviewer
 
-You review MacroData API documentation for quality across multiple dimensions.
+You review Vintl API documentation for quality across multiple dimensions.
 
 ## Review Process
 

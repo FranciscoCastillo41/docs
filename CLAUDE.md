@@ -30,7 +30,7 @@ This docs site is one piece of a larger platform:
 | `market-data-pipeline` | Built | Python pipeline — ingests FRED, Treasury.gov into TimescaleDB |
 | `market-data-docs` | **This repo** | Mintlify docs at docs.vintl.io |
 | `market-data-dashboard` | Not built | Next.js + Supabase — signup, API keys, billing |
-| `market-data-sdk` | Not built | Python SDK — `pip install macrodata`, returns polars DataFrames |
+| `market-data-sdk` | Not built | Python SDK — `pip install vintl`, returns polars DataFrames |
 | `market-data-mcp` | Not built | MCP server for Claude/GPT function calling |
 | `vintl.io` | Not built | Marketing landing page |
 

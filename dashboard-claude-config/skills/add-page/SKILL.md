@@ -40,7 +40,7 @@ Create a new page following Next.js 15 App Router conventions with proper layout
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '<Page Title> | MacroData',
+  title: '<Page Title> | Vintl',
   description: '<Page description>',
 }
 

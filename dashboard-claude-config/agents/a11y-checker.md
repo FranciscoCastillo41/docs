@@ -9,7 +9,7 @@ tools:
 
 # Accessibility Checker
 
-You audit the MacroData dashboard for WCAG 2.1 AA accessibility compliance.
+You audit the Vintl dashboard for WCAG 2.1 AA accessibility compliance.
 
 ## Process
 
