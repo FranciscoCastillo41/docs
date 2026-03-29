@@ -3,8 +3,8 @@
    Matches vintl.io landing page aesthetic
    ═══════════════════════════════════════════════════ */
 
-/* ── Import Departure Mono (not available in Mintlify font config) ── */
-@import url('https://fonts.googleapis.com/css2?family=Departure+Mono&display=swap');
+/* ── Import fonts not available in Mintlify font config ── */
+@import url('https://fonts.googleapis.com/css2?family=Departure+Mono&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ── Design Tokens (from vintl.io :root) ── */
 :root {
@@ -58,17 +58,26 @@ p, li, td {
   line-height: 1.7 !important;
 }
 
-/* Monospace: Departure Mono everywhere */
-pre, code, kbd, samp,
-[class*="mono"], [class*="Mono"],
-[class*="code"], [class*="Code"] {
-  font-family: 'Departure Mono', 'Courier New', monospace !important;
+/* Code blocks: JetBrains Mono (crisp at any size) */
+pre, pre code, pre span {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
 }
 
 pre code {
-  font-size: 0.72rem !important;
-  line-height: 1.85 !important;
-  letter-spacing: 0.02em !important;
+  font-size: 0.78rem !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0 !important;
+  -webkit-font-smoothing: auto !important;
+}
+
+/* Inline code: also JetBrains Mono */
+code, kbd, samp {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+}
+
+/* UI monospace (tabs, table headers, badges): Departure Mono at fixed sizes */
+[class*="mono"], [class*="Mono"] {
+  font-family: 'Departure Mono', 'Courier New', monospace !important;
 }
 
 /* ══════════════════════════════════
@@ -159,7 +168,7 @@ pre code {
 /* Code block topbar (language label) */
 [data-theme="light"] [class*="CodeGroup"] [class*="tab"],
 [data-theme="light"] [class*="codegroup"] [class*="tab"] {
-  font-family: 'Departure Mono', monospace !important;
+  font-family: 'Departure Mono', 'JetBrains Mono', monospace !important;
   font-size: 0.62rem !important;
   letter-spacing: 0.1em !important;
   text-transform: lowercase !important;
@@ -186,7 +195,7 @@ pre code {
 }
 
 [data-theme="light"] th {
-  font-family: 'Departure Mono', monospace !important;
+  font-family: 'Departure Mono', 'JetBrains Mono', monospace !important;
   font-size: 0.62rem !important;
   letter-spacing: 0.14em !important;
   text-transform: uppercase !important;
@@ -230,7 +239,7 @@ pre code {
 
 [data-theme="light"] [role="tab"],
 [data-theme="light"] [class*="Tab"] {
-  font-family: 'Departure Mono', monospace !important;
+  font-family: 'Departure Mono', 'JetBrains Mono', monospace !important;
   font-size: 0.7rem !important;
   letter-spacing: 0.06em !important;
   text-transform: lowercase !important;
@@ -257,7 +266,7 @@ pre code {
   background: var(--ink) !important;
   color: var(--paper) !important;
   border-radius: 2px !important;
-  font-family: 'Departure Mono', monospace !important;
+  font-family: 'Departure Mono', 'JetBrains Mono', monospace !important;
   font-size: 0.72rem !important;
   letter-spacing: 0.06em !important;
   transition: background 0.18s !important;
@@ -282,7 +291,7 @@ pre code {
   background: var(--paper2) !important;
   border: 1px solid var(--line) !important;
   border-radius: 3px !important;
-  font-family: 'Departure Mono', monospace !important;
+  font-family: 'Departure Mono', 'JetBrains Mono', monospace !important;
   font-size: 0.72rem !important;
 }
 
@@ -320,7 +329,7 @@ pre code {
 [data-theme="light"] [class*="Badge"],
 [data-theme="light"] [class*="tag"],
 [data-theme="light"] [class*="Tag"] {
-  font-family: 'Departure Mono', monospace !important;
+  font-family: 'Departure Mono', 'JetBrains Mono', monospace !important;
   font-size: 0.58rem !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
@@ -374,7 +383,7 @@ pre code {
 }
 
 [data-theme="dark"] th {
-  font-family: 'Departure Mono', monospace !important;
+  font-family: 'Departure Mono', 'JetBrains Mono', monospace !important;
   font-size: 0.62rem !important;
   letter-spacing: 0.14em !important;
   text-transform: uppercase !important;
