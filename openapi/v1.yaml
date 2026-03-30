@@ -4,7 +4,9 @@ info:
   version: 1.0.0
   description: |
     Point-in-time macro-economic and treasury data API.
+
     The killer feature: `?as_of=DATE` returns what economic data was known at any historical date.
+    Requires Pro plan or higher — free plan returns latest data only.
   contact:
     name: Vintl Support
     url: https://vintl.io
@@ -26,7 +28,7 @@ components:
       type: apiKey
       in: header
       name: X-API-Key
-      description: API key prefixed with `vntl_live_`
+      description: API key prefixed with `mda_live_sk_`
 
   schemas:
     YieldRate:
@@ -48,6 +50,9 @@ components:
           type: string
           enum: ["PAR", "TIPS"]
           example: "PAR"
+        source:
+          type: string
+          example: "TREASURY"
 
     SpreadPoint:
       type: object
@@ -55,6 +60,7 @@ components:
         trade_date:
           type: string
           format: date-time
+          example: "2026-03-24T00:00:00Z"
         long_rate:
           type: string
           example: "4.39"
@@ -97,6 +103,9 @@ components:
         frequency:
           type: string
           example: "Q"
+        source:
+          type: string
+          example: "FRED"
 
     Series:
       type: object
@@ -112,20 +121,25 @@ components:
           enum: ["D", "W", "M", "Q", "A"]
         units:
           type: string
+          example: "lin"
         observation_count:
           type: integer
+          example: 316
         last_updated:
           type: string
           format: date-time
+        source:
+          type: string
+          example: "FRED"
 
     Problem:
       type: object
-      description: RFC 9457 Problem Details
+      description: RFC 9457 Problem Details (Content-Type application/problem+json)
       properties:
         type:
           type: string
           format: uri
-          example: "https://vintl.io/errors/not-found"
+          example: "https://macrodata.dev/errors/not-found"
         title:
           type: string
           example: "Not Found"
@@ -137,8 +151,37 @@ components:
           example: "series 'INVALID' not found"
         instance:
           type: string
+          example: "/v1/series/INVALID"
         request_id:
           type: string
+          example: "req_19d40c11691b60ece4cc73351271260"
+        field:
+          type: string
+          description: Which field caused the error (on validation errors)
+
+    Envelope:
+      type: object
+      description: Standard response envelope (Stripe-inspired)
+      properties:
+        object:
+          type: string
+          example: "yield_series"
+        request_id:
+          type: string
+          example: "req_19d40c11691b60ece4cc73351271260"
+        status:
+          type: string
+          example: "ok"
+        results:
+          type: array
+          items: {}
+        results_count:
+          type: integer
+        has_more:
+          type: boolean
+        next_cursor:
+          type: string
+          description: Opaque cursor for next page. Absent when no more results.
 
   parameters:
     limit:
@@ -170,43 +213,105 @@ components:
         format: date
       description: End date (YYYY-MM-DD)
 
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://macrodata.dev/errors/unauthorized"
+            title: "Unauthorized"
+            status: 401
+            detail: "API key is required. Set the X-API-Key header."
+            instance: "/v1/ping"
+    PlanUpgradeRequired:
+      description: Feature requires a higher plan
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          example:
+            type: "https://macrodata.dev/errors/plan-upgrade-required"
+            title: "Plan Upgrade Required"
+            status: 403
+            detail: "Point-in-time queries (?as_of) requires a Pro plan or higher. Upgrade at app.vintl.io/billing"
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds until rate limit resets
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
 paths:
   /healthz:
     get:
       summary: Liveness probe
       security: []
+      tags: [Health]
       responses:
         "200":
           description: Server is alive
+          content:
+            application/json:
+              example:
+                status: "ok"
 
   /readyz:
     get:
       summary: Readiness probe
+      description: Checks Postgres and Redis connectivity
       security: []
+      tags: [Health]
       responses:
         "200":
           description: All dependencies healthy
+          content:
+            application/json:
+              example:
+                status: "ok"
+                checks:
+                  postgres: "healthy"
+                  redis: "healthy"
         "503":
           description: One or more dependencies unhealthy
 
   /v1/ping:
     get:
       summary: Auth test
-      description: Validates API key and returns plan info
+      description: Validates API key and returns plan info, limits, and feature access
       tags: [Auth]
       responses:
         "200":
           description: API key is valid
-        "401":
-          description: Missing or invalid API key
           content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
+            application/json:
+              example:
+                object: "ping"
+                request_id: "req_19d40c11691b60ece4cc73351271260"
+                status: "ok"
+                results:
+                  - status: "ok"
+                    message: "API key is valid"
+                    plan: "pro"
+                    monthly_limit: 50000
+                    rate_per_minute: 60
+                    vintage_access: true
+                results_count: 1
+                has_more: false
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /v1/treasury/yields:
     get:
       summary: List treasury yield rates
+      description: Returns yield rates filtered by maturity, curve type, and date range. Paginated.
       tags: [Treasury]
       parameters:
         - name: maturity
@@ -214,6 +319,7 @@ paths:
           schema:
             type: string
             enum: ["1M", "2M", "3M", "4M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "20Y", "30Y"]
+          description: Filter by specific maturity
         - name: curve_type
           in: query
           schema:
@@ -235,6 +341,10 @@ paths:
                   object:
                     type: string
                     example: "yield_series"
+                  request_id:
+                    type: string
+                  status:
+                    type: string
                   results:
                     type: array
                     items:
@@ -245,10 +355,21 @@ paths:
                     type: boolean
                   next_cursor:
                     type: string
+        "400":
+          description: Invalid maturity, curve_type, or date format
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /v1/treasury/yields/curve:
     get:
       summary: Full yield curve for a date
+      description: Returns all maturities for a single date. Defaults to today if no date specified.
       tags: [Treasury]
       parameters:
         - name: date
@@ -257,6 +378,7 @@ paths:
             type: string
             format: date
           description: Date for the curve snapshot (defaults to today)
+          example: "2026-03-24"
         - name: curve_type
           in: query
           schema:
@@ -266,10 +388,27 @@ paths:
       responses:
         "200":
           description: All maturities for the given date
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "yield_curve"
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/YieldRate"
+        "400":
+          description: Invalid date format
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /v1/treasury/yields/spread:
     get:
       summary: Yield spread over time
+      description: Returns the spread between two maturities (default 10Y-2Y) with basis points calculated.
       tags: [Treasury]
       parameters:
         - name: long
@@ -277,11 +416,13 @@ paths:
           schema:
             type: string
             default: "10Y"
+          description: Long-end maturity
         - name: short
           in: query
           schema:
             type: string
             default: "2Y"
+          description: Short-end maturity
         - name: curve_type
           in: query
           schema:
@@ -292,25 +433,61 @@ paths:
       responses:
         "200":
           description: Spread time series with basis points
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "yield_spread"
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SpreadPoint"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /v1/series:
     get:
       summary: Search and list available series
+      description: Returns all available economic indicator series. Filter by ID pattern with the `q` parameter.
       tags: [Series]
       parameters:
         - name: q
           in: query
           schema:
             type: string
-          description: Search query (matches series ID)
+          description: Search query (matches series ID, case-insensitive)
+          example: "GDP"
         - $ref: "#/components/parameters/limit"
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Pagination cursor from previous response
       responses:
         "200":
           description: Paginated series list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "series_list"
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Series"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /v1/series/{id}:
     get:
       summary: Series metadata
+      description: Returns metadata for a single economic indicator series.
       tags: [Series]
       parameters:
         - name: id
@@ -322,12 +499,26 @@ paths:
       responses:
         "200":
           description: Series metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "series"
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Series"
         "404":
           description: Series not found
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /v1/series/{id}/observations:
     get:
@@ -335,6 +526,9 @@ paths:
       description: |
         Returns the latest values by default. Add `?as_of=DATE` for point-in-time queries —
         the killer feature that returns what was known at any historical date.
+
+        **Plan restriction:** `?as_of=` requires Pro plan or higher. Free plan returns latest data only.
+        Free users attempting `?as_of=` receive a 403 with upgrade instructions.
       tags: [Macro]
       parameters:
         - name: id
@@ -349,15 +543,18 @@ paths:
             type: string
             format: date
           description: |
-            **THE KILLER FEATURE.** Returns observations as they were known on this date.
-            Example: `?as_of=2023-10-26` returns GDP at the advance estimate value.
+            **Point-in-time query.** Returns observations as they were known on this date.
+            Example: `?as_of=2023-10-26` returns GDP at the advance estimate value ($22,491.567B),
+            not today's revised value ($22,840.989B). Requires Pro plan or higher.
+          example: "2023-10-26"
         - $ref: "#/components/parameters/from"
         - $ref: "#/components/parameters/to"
         - $ref: "#/components/parameters/limit"
         - $ref: "#/components/parameters/cursor"
       responses:
         "200":
-          description: Observations with optional point-in-time context
+          description: |
+            Observations. When `as_of` is provided, includes `series` metadata and `as_of` field.
           content:
             application/json:
               schema:
@@ -366,11 +563,17 @@ paths:
                   object:
                     type: string
                     example: "observation_series"
+                  request_id:
+                    type: string
+                  status:
+                    type: string
                   as_of:
                     type: string
                     format: date
+                    description: Present only when ?as_of= was used
                   series:
                     type: object
+                    description: Present only when ?as_of= was used
                     properties:
                       id:
                         type: string
@@ -382,11 +585,27 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Observation"
+                  results_count:
+                    type: integer
+                  has_more:
+                    type: boolean
+                  next_cursor:
+                    type: string
+        "400":
+          description: Invalid date format or date range
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/PlanUpgradeRequired"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /v1/series/{id}/revisions:
     get:
       summary: Revision history for one observation
-      description: Returns all vintages (revisions) of a single observation date, ordered by publication date.
+      description: |
+        Returns all vintages (revisions) of a single observation date, ordered by publication date ascending.
+        Shows how an economic data point was revised over time from initial release through annual revisions.
       tags: [Macro]
       parameters:
         - name: id
@@ -406,13 +625,58 @@ paths:
       responses:
         "200":
           description: All revisions ordered by as_of_date ascending
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "revision_series"
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Observation"
+              example:
+                object: "revision_series"
+                request_id: "req_..."
+                status: "ok"
+                results:
+                  - date: "2023-07-01T00:00:00Z"
+                    as_of_date: "2023-10-26T00:00:00Z"
+                    value: "22491.567"
+                    series_id: "GDPC1"
+                  - date: "2023-07-01T00:00:00Z"
+                    as_of_date: "2023-11-29T00:00:00Z"
+                    value: "22506.365"
+                    series_id: "GDPC1"
+                  - date: "2023-07-01T00:00:00Z"
+                    as_of_date: "2023-12-21T00:00:00Z"
+                    value: "22490.692"
+                    series_id: "GDPC1"
+                  - date: "2023-07-01T00:00:00Z"
+                    as_of_date: "2024-09-26T00:00:00Z"
+                    value: "22780.933"
+                    series_id: "GDPC1"
+                  - date: "2023-07-01T00:00:00Z"
+                    as_of_date: "2025-09-25T00:00:00Z"
+                    value: "22840.989"
+                    series_id: "GDPC1"
+                results_count: 5
+                has_more: false
+        "400":
+          description: Missing or invalid date parameter
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
 tags:
+  - name: Health
+    description: Liveness and readiness probes
+  - name: Auth
+    description: API key validation and plan info
   - name: Treasury
     description: U.S. Treasury yield curve data (1990-present, never revised)
   - name: Macro
     description: Economic indicators with point-in-time vintage tracking
   - name: Series
     description: Series discovery and metadata
-  - name: Auth
-    description: API key validation
