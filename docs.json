@@ -42,9 +42,7 @@
   },
   "thumbnails": {
     "appearance": "dark",
-    "background": {
-      "color": "#100D0A"
-    },
+    "background": "#100D0A",
     "color": "#F0EAE0",
     "fonts": {
       "family": "Playfair Display"
