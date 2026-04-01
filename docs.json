@@ -41,7 +41,11 @@
     "prompt": "Search docs..."
   },
   "thumbnails": {
-    "appearance": "light",
+    "appearance": "dark",
+    "background": {
+      "color": "#100D0A"
+    },
+    "color": "#F0EAE0",
     "fonts": {
       "family": "Playfair Display"
     }
@@ -50,6 +54,7 @@
     "indexing": "navigable",
     "metatags": {
       "og:site_name": "Vintl API Docs",
+      "og:image:alt": "Vintl — Point-in-time financial data API",
       "twitter:card": "summary_large_image"
     }
   },
