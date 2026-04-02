@@ -7,7 +7,7 @@
     "light": "/logo/light.svg",
     "href": "/"
   },
-  "favicon": "/vintl-profile-x.png",
+  "favicon": "/logo.png",
   "theme": "maple",
   "appearance": {
     "default": "light"
