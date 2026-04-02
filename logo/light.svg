@@ -1,4 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 32">
-  <text x="0" y="24" font-family="'Playfair Display', Georgia, serif" font-weight="500" font-size="22" fill="#100D0A">Vintl</text>
-  <text x="52" y="24" font-family="'Playfair Display', Georgia, serif" font-weight="500" font-size="22" fill="#B82F1C">.</text>
+  <text x="0" y="24" font-family="'Geist Sans', system-ui, sans-serif" font-weight="700" font-size="20" letter-spacing="-0.03em" fill="#0a0a0a">Vintl</text>
 </svg>

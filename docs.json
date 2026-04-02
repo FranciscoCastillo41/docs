@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "Vintl API",
+  "name": "Vintl",
   "description": "Point-in-time macro-economic and treasury data API.",
   "logo": {
     "dark": "/logo/dark.svg",
@@ -13,39 +13,39 @@
     "default": "light"
   },
   "colors": {
-    "primary": "#B82F1C",
-    "light": "#D93820",
-    "dark": "#8B2015"
+    "primary": "#10b981",
+    "light": "#059669",
+    "dark": "#34d399"
   },
   "background": {
     "color": {
-      "light": "#F5F0E6",
-      "dark": "#100D0A"
+      "light": "#ffffff",
+      "dark": "#0a0a0a"
     }
   },
   "fonts": {
     "heading": {
-      "family": "Playfair Display",
-      "weight": 500
+      "family": "Geist Sans",
+      "weight": 700
     },
     "body": {
-      "family": "Instrument Sans",
-      "weight": 300
+      "family": "Geist Sans",
+      "weight": 400
     }
   },
   "styling": {
-    "codeblocks": "dark",
+    "codeblocks": {},
     "css": "/global.css"
   },
   "search": {
     "prompt": "Search docs..."
   },
   "thumbnails": {
-    "appearance": "dark",
-    "background": "#100D0A",
-    "color": "#F0EAE0",
+    "appearance": "light",
+    "background": "#ffffff",
+    "color": "#0a0a0a",
     "fonts": {
-      "family": "Playfair Display"
+      "family": "Geist Sans"
     }
   },
   "seo": {
@@ -61,12 +61,12 @@
   },
   "topbar": {
     "links": [
-      { "name": "Dashboard", "url": "https://app.vintl.io" },
+      { "name": "Explore", "url": "https://vintl.io/explore" },
       { "name": "Status", "url": "https://status.vintl.io" }
     ],
     "cta": {
       "name": "Get API Key",
-      "url": "https://app.vintl.io/signup"
+      "url": "https://vintl.io/sign-up"
     }
   },
   "navigation": {
