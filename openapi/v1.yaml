@@ -109,6 +109,10 @@ components:
 
     Series:
       type: object
+      description: |
+        Available series: GDPC1, CPIAUCSL, CPILFESL, UNRATE, PAYEMS, ICSA, FEDFUNDS,
+        MORTGAGE30US, INDPRO, HOUST, PCEPI, PCE, UMCSENT, RSAFS, T10Y2Y, VIXCLS,
+        DEXUSEU, BAA10Y, DGS10, DGS2, DGS30
       properties:
         id:
           type: string
@@ -131,6 +135,97 @@ components:
         source:
           type: string
           example: "FRED"
+
+    InsiderFiling:
+      type: object
+      description: SEC Form 4 insider transaction filing
+      properties:
+        filing_date:
+          type: string
+          format: date-time
+        transaction_date:
+          type: string
+          format: date-time
+        accession_number:
+          type: string
+        ticker:
+          type: string
+          example: "NVDA"
+        issuer_name:
+          type: string
+        owner_name:
+          type: string
+          example: "Jensen Huang"
+        officer_title:
+          type: string
+          example: "CEO"
+        transaction_code:
+          type: string
+          description: "P=Purchase, S=Sale, M=Option Exercise, A=Award, F=Tax"
+          enum: ["P", "S", "M", "A", "F", "J"]
+        acquired_disposed:
+          type: string
+          enum: ["A", "D"]
+        shares:
+          type: string
+          description: Number of shares (string for precision)
+          example: "70000"
+        price_per_share:
+          type: string
+          example: "7.37"
+        is_director:
+          type: boolean
+        is_officer:
+          type: boolean
+        is_ten_percent:
+          type: boolean
+
+    InsiderCluster:
+      type: object
+      description: Auto-detected insider buying cluster — 3+ C-suite/directors buying the same stock
+      properties:
+        ticker:
+          type: string
+          example: "NVDA"
+        issuer_name:
+          type: string
+        cluster_size:
+          type: integer
+          description: Number of distinct insiders buying
+          example: 3
+        total_shares:
+          type: string
+          example: "150000"
+        total_value:
+          type: string
+          description: Total dollar value of purchases
+          example: "1500000.00"
+        date_first:
+          type: string
+          format: date-time
+        date_last:
+          type: string
+          format: date-time
+        insiders:
+          type: array
+          items:
+            type: object
+            properties:
+              owner_name:
+                type: string
+              officer_title:
+                type: string
+              shares:
+                type: string
+              price_per_share:
+                type: string
+              transaction_date:
+                type: string
+                format: date-time
+              is_director:
+                type: boolean
+              is_officer:
+                type: boolean
 
     Problem:
       type: object
@@ -669,6 +764,109 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /v1/insider/filings:
+    get:
+      summary: List insider transaction filings
+      description: |
+        Returns SEC Form 4 insider transaction filings. Filter by ticker, insider name, or time window.
+        Defaults to last 30 days if no time filter specified.
+      tags: [Insider]
+      parameters:
+        - name: ticker
+          in: query
+          schema:
+            type: string
+          description: Filter by stock ticker (case-insensitive)
+          example: "NVDA"
+        - name: owner_name
+          in: query
+          schema:
+            type: string
+          description: Search by insider name (partial match, case-insensitive)
+          example: "jensen"
+        - name: days
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 365
+          description: Lookback window in days (default 30)
+        - $ref: "#/components/parameters/from"
+        - $ref: "#/components/parameters/to"
+        - $ref: "#/components/parameters/limit"
+      responses:
+        "200":
+          description: Paginated insider filings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "insider_filings"
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InsiderFiling"
+                  results_count:
+                    type: integer
+                  has_more:
+                    type: boolean
+                  next_cursor:
+                    type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /v1/insider/clusters:
+    get:
+      summary: Detect insider buying clusters
+      description: |
+        Auto-detects when multiple C-suite executives or directors are buying the same stock
+        within a rolling time window. Only counts open-market purchases (transaction_code='P')
+        by officers or directors. Default: 3+ insiders within 14 days.
+      tags: [Insider]
+      parameters:
+        - name: min_insiders
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 3
+          description: Minimum number of distinct insiders to qualify as a cluster
+        - name: days
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 365
+            default: 14
+          description: Rolling window in days
+        - $ref: "#/components/parameters/limit"
+      responses:
+        "200":
+          description: Detected insider buying clusters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: "insider_clusters"
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InsiderCluster"
+                  results_count:
+                    type: integer
+                  has_more:
+                    type: boolean
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 tags:
   - name: Health
     description: Liveness and readiness probes
@@ -680,3 +878,5 @@ tags:
     description: Economic indicators with point-in-time vintage tracking
   - name: Series
     description: Series discovery and metadata
+  - name: Insider
+    description: SEC Form 4 insider trading data with cluster detection
